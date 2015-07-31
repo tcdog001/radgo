@@ -23,9 +23,17 @@ func (me EAstValue) Int() int {
 }
 
 func (me EAstValue) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(astBind)==me.End() && 
-		len(astBind[me]) > 0
+	if !IsGoodEnum(me) {
+		log.Info("bad %s %d", me.Tag(), me)
+		
+		return false
+	} else if 0==len(astBind[me]) {
+		log.Info("no support %s %d", me.Tag(), me)
+		
+		return false
+	}
+	
+	return true
 }
 
 func (me EAstValue) ToString() string {

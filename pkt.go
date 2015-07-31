@@ -2,6 +2,7 @@ package radgo
 
 import (
 	. "asdf"
+	"fmt"
 	"encoding/binary"
 )
 
@@ -29,8 +30,17 @@ type Header struct {
 	Auth 	[16]byte
 }
 
-func isGoodPktLength(length uint16) bool{
-	return length >= PktLengthMin && length <= PktLengthMax
+func isGoodPktLength(Len uint16) bool{
+	if Len < PktLengthMin || Len > PktLengthMax {
+		log.Info("pkt length min is %d, max is %d, the Len is %d",
+			PktLengthMin,
+			PktLengthMax,
+			Len)
+		
+		return false
+	}
+	
+	return true
 }
 
 func (me *Header) IsGood() bool {
@@ -91,13 +101,24 @@ func (me *Header) FromBinary(bin []byte) error {
 
 type Packet struct {
 	Header
-	Attrs [AttrTypeEnd]Attr
+	Attrs [AttrTypeEnd]*Attr
 }
 
 func (me *Packet) Init() {
-	for i:=AttrTypeBegin; i<AttrTypeEnd; i++ {
-		me.Attrs[i].Type = i
+	me.Len = PktHdrSize
+}
+
+func (me *Packet) attr(Type EAttrType) (*Attr, bool) {
+	if nil!=me.Attrs[Type] {
+		return me.Attrs[Type], false
 	}
+	
+	me.Attrs[Type] = new(Attr)
+	me.Attrs[Type].Type = Type
+	
+	fmt.Println("create new attr", Type.ToString())
+	
+	return me.Attrs[Type], true
 }
 
 func (me *Packet) SetAttrNumber(Type EAttrType, Value uint32) error {
@@ -105,7 +126,13 @@ func (me *Packet) SetAttrNumber(Type EAttrType, Value uint32) error {
 		return Error
 	}
 	
-	return (&me.Attrs[Type]).SetNumber(Value)
+	attr, create := me.attr(Type)
+	err := attr.SetNumber(Value)
+	if create && nil==err {
+		me.Len += uint16(attr.Len)
+	}
+	
+	return err
 }
 
 type AttrNumber struct {
@@ -127,12 +154,18 @@ func (me *Packet) SetAttrString(Type EAttrType, Value []byte) error {
 	if nil==Value {
 		return nil // Not Error
 	}
-	
+
 	if !me.Code.IsMatch(Type) {
 		return Error
 	}
 	
-	return (&me.Attrs[Type]).SetString(Value)
+	attr, create := me.attr(Type)
+	err := attr.SetString(Value)
+	if create && nil==err {
+		me.Len += uint16(attr.Len)
+	}
+	
+	return err
 }
 
 type AttrString struct {
@@ -146,21 +179,40 @@ func (me *Packet) SetAttrStringList(list []AttrString) error {
 			return err
 		}
 	}
-	
+
 	return nil
 }
 
 func (me *Packet) CheckMust() error {
 	for i:=AttrTypeBegin; i<AttrTypeEnd; i++ {
-		attr := &me.Attrs[i]
+		attr := me.Attrs[i]
 		
+		// if the code is must, but attr is empty
 		if me.Code.IsMust(i) && !attr.IsGood() {
+			log.Info("attr type %s must match code %s, but attr is bad",
+				i.ToString(),
+				me.Code.ToString())
+				
 			return Error
 		}
 	}
 	
 	return nil
 }
+
+/*
+func (me *Packet) CalcLength() uint16 {
+	Len := uint16(PktHdrSize)
+	
+	for i:=AttrTypeBegin; i<AttrTypeEnd; i++ {
+		if attr := me.Attrs[i]; nil!=attr {
+			Len += uint16(attr.Len)
+		}
+	}
+	
+	return Len
+}
+*/
 
 func (me *Packet) ToBinary(bin []byte) error {
 	if nil==me {
@@ -170,7 +222,7 @@ func (me *Packet) ToBinary(bin []byte) error {
 	if !me.IsGood() {
 		return Error
 	}
-	
+
 	if err := me.CheckMust(); nil!=err {
 		return err
 	}
@@ -183,8 +235,8 @@ func (me *Packet) ToBinary(bin []byte) error {
 	
 	// attr==>bin
 	for i:=AttrTypeBegin; i<AttrTypeEnd; i++ {
-		attr := &me.Attrs[i]
-		if !attr.IsGood() {
+		attr := me.Attrs[i]
+		if nil==attr {
 			continue
 		}
 		
@@ -202,7 +254,8 @@ func (me *Packet) FromBinary(bin []byte) error {
 		return Error
 	}
 	
-	if !isGoodPktLength(uint16(len(bin))) {
+	Len := uint16(len(bin))
+	if !isGoodPktLength(Len) {
 		return Error
 	}
 	
@@ -214,7 +267,7 @@ func (me *Packet) FromBinary(bin []byte) error {
 
 	// bin==>attr
 	for len(bin) > 0 {
-		attr := &me.Attrs[bin[0]]
+		attr := me.Attrs[bin[0]]
 		
 		if err:=attr.FromBinary(bin); nil!=err {
 			return err
@@ -225,27 +278,44 @@ func (me *Packet) FromBinary(bin []byte) error {
 		}
 		
 		bin = bin[attr.Len:]
+		
+		me.Len += uint16(attr.Len)
 	}
 	
-	return me.CheckMust()
+	if err:=me.CheckMust(); nil!=err {
+		return err
+	}
+	
+	return nil
 }
 
-func (me *Packet) Policy(policy *Policy) {
-	var attr *Attr
+func (me *Packet) Policy() *Policy {
+	if AccessAccept!=me.Code {
+		return nil
+	}
 	
-	attr = &me.Attrs[SessionTimeout]
+	var attr *Attr
+	policy := &Policy{}
+	
+	attr = me.Attrs[SessionTimeout]
 	if attr.IsGood() {
 		policy.OnlineTime = attr.Number
 	}
 	
-	attr = &me.Attrs[IdleTimeout]
+	attr = me.Attrs[IdleTimeout]
 	if attr.IsGood() {
 		policy.IdleTimeout = attr.Number
 	}
 	
-	attr = &me.Attrs[Class]
+	attr = me.Attrs[Class]
 	if attr.IsGood() {
-		policy.FlowLimit = 0
-		policy.RateLimit = 0
+		class := AttrClass(attr.GetString())
+		
+		policy.UpRateMax 	= class.UpRateMax()
+		policy.UpRateAvg 	= class.UpRateAvg()
+		policy.DownRateMax 	= class.DownRateMax()
+		policy.DownRateAvg 	= class.DownRateAvg()
 	}
+	
+	return policy
 }

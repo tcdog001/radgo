@@ -23,9 +23,16 @@ func (me EAttrType) Int() int {
 }
 
 func (me EAttrType) IsGood() bool {
-	return me >= AttrTypeBegin && me < AttrTypeEnd &&
-		len(attrTypeBind)==me.End() &&
-		nil != attrTypeBind[me]
+	if me < AttrTypeBegin ||  me > AttrTypeEnd {
+		log.Info("min attr is %d, max attr is %d, this attr is %d", 
+			AttrTypeBegin,
+			AttrTypeEnd,
+			me)
+		
+		return false
+	}
+	
+	return nil != attrTypeBind[me]
 }
 
 func (me EAttrType) ToString() string {
@@ -47,7 +54,7 @@ func (me *EAttrType) FromString(s string) error {
 }
 
 func (me EAttrType) ValueType() EAttrValueType {
-	if !me.IsGood() || nil==attrTypeBind[me] {
+	if !me.IsGood() {
 		return AvtString
 	}
 	
@@ -55,9 +62,20 @@ func (me EAttrType) ValueType() EAttrValueType {
 }
 
 func (me EAttrType) IsGoodLength(Len byte) bool {
-	return me.IsGood() &&
-		Len >= (attrTypeBind[me].min + 2) &&
-		Len <= (attrTypeBind[me].max + 2)
+	if !me.IsGood() {
+		return false
+	} else if Len < (attrTypeBind[me].min + 2) || 
+			  Len > (attrTypeBind[me].max + 2) {
+		log.Info("attr(%s) min is %d, max is %d, but Len is %d", 
+			me.ToString(),
+			attrTypeBind[me].min,
+			attrTypeBind[me].max,
+			Len - 2)
+			
+		return false
+	}
+	
+	return true
 }
 
 func (me EAttrType) IsGoodValue(Value uint32) bool {
@@ -469,7 +487,7 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 	},
 }
 
-func initAttrType(){
+func initAttrType(){	
 	for idx := AttrTypeBegin; idx<AttrTypeEnd; idx++ {
 		v := attrTypeBind[idx]
 		if nil==v {

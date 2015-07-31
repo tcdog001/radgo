@@ -4,6 +4,7 @@ import (
 	. "asdf"
 	"bytes"
 	"os"
+	"fmt"
 	"encoding/json"
 )
 
@@ -18,6 +19,8 @@ type DebugConfig struct {
 func (me *DebugConfig) Load() {
 	f, err := os.Open(fileDebug)
 	if nil!=err {
+		fmt.Println("no found", fileDebug)
+		
 		return // no debug file, just return
 	}
 	defer f.Close()
@@ -29,6 +32,8 @@ func (me *DebugConfig) Load() {
 	}
 	
 	json.Unmarshal(b.Bytes(), me)
+	
+	fmt.Println("load ", fileDebug, me)
 }
 
 type DebugControl struct {

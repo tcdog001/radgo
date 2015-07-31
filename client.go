@@ -4,6 +4,7 @@ import (
 	. "asdf"
 	"time"
 	"net"
+	"fmt"
 )
 
 type IAuth interface {
@@ -15,6 +16,8 @@ type IAuth interface {
 type IAcct interface {
 	IParam
 	
+	SSID() []byte
+	DevMac() []byte
 	SessionId() []byte
 	UserName() []byte
 	UserMac() []byte // binary mac
@@ -24,6 +27,11 @@ type IAcct interface {
 	AcctInputGigawords() uint32
 	AcctOutputGigawords() uint32
 	AcctTerminateCause() uint32
+	
+	// cache Class on user when auth
+	// get Class from user when acct
+	GetClass() []byte
+	SetClass(class []byte)
 }
 
 type IParam interface {
@@ -32,7 +40,7 @@ type IParam interface {
 	NasIpAddress() uint32
 	NasPort() uint32
 	NasPortType() uint32
-	NasPortId() uint32
+//	NasPortId() uint32
 	ServiceType() uint32
 	Server () string
 	AuthPort() string
@@ -43,8 +51,14 @@ type IParam interface {
 type Policy struct {
 	IdleTimeout uint32
 	OnlineTime 	uint32
-	FlowLimit 	uint32
-	RateLimit 	uint32
+	
+	UpFlowLimit 	uint64
+	UpRateMax		uint32
+	UpRateAvg		uint32
+	
+	DownFlowLimit 	uint64
+	DownRateMax		uint32
+	DownRateAvg		uint32
 }
 
 type client struct {
@@ -98,22 +112,26 @@ func (me *client) initConn(r IAcct) error {
 }
 
 func (me *client) initAuth(r IAuth) error {
-	pkt := &me.request
+	q := &me.request
 	
-	pkt.Code = AccessRequest
-	pkt.Id	= PktId()
-	if err := PktAuth(pkt.Auth[:]).AuthRequest(r.UserMac()); nil!=err {
+	q.Code = AccessRequest
+	q.Id	= PktId()
+	if err := PktAuth(q.Auth[:]).AuthRequest(r.UserMac()); nil!=err {
 		return me.debugError(err)
 	}
-	
-	if err := pkt.SetAttrStringList([]AttrString{
+
+	if err := q.SetAttrStringList([]AttrString{
 		{
 			Type:UserName,
 			Value:r.UserName(),
 		},
 		{
 			Type:UserPassword,
-			Value:r.UserPassword(),
+			Value:AttrUserPassword(r.UserPassword()).Encrypt(q.Auth[:], r.Secret()),
+		},
+		{
+			Type:CalledStationId,
+			Value:[]byte(MakeCalledStationId(r.DevMac(), r.SSID())),
 		},
 		{
 			Type:CallingStationId,
@@ -126,8 +144,8 @@ func (me *client) initAuth(r IAuth) error {
 	}); nil!=err {
 		return me.debugError(err)
 	}
-	
-	if err := pkt.SetAttrNumberList([]AttrNumber{
+
+	if err := q.SetAttrNumberList([]AttrNumber{
 		{
 			Type:FramedIpAddress,
 			Value:r.UserIp(),
@@ -145,33 +163,33 @@ func (me *client) initAuth(r IAuth) error {
 			Value:r.NasPortType(),
 		},
 		{
-			Type:NasPortId,
-			Value:r.NasPortId(),
-		},
-		{
 			Type:ServiceType,
 			Value:r.ServiceType(),
 		},
 	}); nil!=err {
 		return me.debugError(err)
 	}
-	
+
 	return nil
 }
 
 func (me *client) initAcct(r IAcct, action EAastValue) error {
-	pkt := &me.request
+	q := &me.request
 	
-	pkt.Code = AccountingRequest
-	pkt.Id	= PktId()
-	if err := PktAuth(pkt.Auth[:]).AcctRequest(me.bin[:], r.Secret()); nil!=err {
+	q.Code = AccountingRequest
+	q.Id	= PktId()
+	if err := PktAuth(q.Auth[:]).AcctRequest(me.bin[:], r.Secret()); nil!=err {
 		return me.debugError(err)
 	}
-		
-	if err := pkt.SetAttrStringList([]AttrString{
+	
+	if err := q.SetAttrStringList([]AttrString{
 		{
 			Type:UserName,
 			Value:r.UserName(),
+		},
+		{
+			Type:CalledStationId,
+			Value:[]byte(MakeCalledStationId(r.DevMac(), r.SSID())),
 		},
 		{
 			Type:CallingStationId,
@@ -185,11 +203,15 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 			Type:NasIdentifier,
 			Value:r.NasIdentifier(),
 		},
+		{
+			Type:Class,
+			Value:r.GetClass(),
+		},
 	}); nil!=err {
 		return me.debugError(err)
 	}
 	
-	if err := pkt.SetAttrNumberList([]AttrNumber{
+	if err := q.SetAttrNumberList([]AttrNumber{
 		{
 			Type:FramedIpAddress,
 			Value:r.UserIp(),
@@ -210,12 +232,24 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 			Type:NasIpAddress,
 			Value:r.NasIpAddress(),
 		},
+		{
+			Type:NasPort,
+			Value:r.NasPort(),
+		},
+		{
+			Type:NasPortType,
+			Value:r.NasPortType(),
+		},
+		{
+			Type:ServiceType,
+			Value:r.ServiceType(),
+		},
 	}); nil!=err {
 		return me.debugError(err)
 	}
 	
-	if AastStart!=action {
-		if err := pkt.SetAttrNumberList([]AttrNumber{
+	if AastStop==action || AastInterimUpdate==action {
+		if err := q.SetAttrNumberList([]AttrNumber{
 			{
 				Type:AcctInputOctets,
 				Value:r.AcctInputOctets(),
@@ -232,17 +266,13 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 				Type:AcctOutputGigawords,
 				Value:r.AcctOutputGigawords(),
 			},
-			{
-				Type:AcctDelayTime,
-				Value:0, // fix 0 ???
-			},
 		}); nil!=err {
 			return me.debugError(err)
 		}
 	}
 	
 	if AastStop==action {
-		if err := pkt.SetAttrNumberList([]AttrNumber{
+		if err := q.SetAttrNumberList([]AttrNumber{
 			{
 				Type:AcctTerminateCause,
 				Value:r.AcctTerminateCause(),
@@ -290,19 +320,26 @@ func (me *client) auth(r IAuth) (*Policy, error) {
 		return nil, me.debugError(err)
 	}
 	
+	fmt.Println("auth", 5)
 	if err := me.net(); nil!=err {
 		return nil, me.debugError(err)
 	}
 	
+	fmt.Println("auth", 6)
 	p := &me.response
 	if err := p.FromBinary(me.bin[:]); nil!=err {
 		return nil, me.debugError(err)
 	}
 	
-	policy := &Policy{}
-	p.Policy(policy)
+	fmt.Println("auth", 7)
+	if AccessAccept!=p.Code {
+		return nil, me.debugError(Error)
+	}
 	
-	return policy, nil
+	fmt.Println("auth", 8)
+	r.SetClass(p.Attrs[Class].GetString())
+	
+	return p.Policy(), nil
 }
 
 func (me *client) acct(r IAcct, action EAastValue) (bool, error) {
@@ -333,6 +370,10 @@ func (me *client) acct(r IAcct, action EAastValue) (bool, error) {
 	p := &me.response
 	if err := p.FromBinary(me.bin[:]); nil!=err {
 		return false, me.debugError(err)
+	}
+	
+	if AccountingResponse!=p.Code {
+		return false, me.debugError(Error)
 	}
 	
 	return true, nil

@@ -43,7 +43,16 @@ func (me EPktCode) Match(Type EAttrType) EAttrTableValue {
 }
 
 func (me EPktCode) IsMatch(Type EAttrType) bool {
-	return AttrTableZero!=me.Match(Type)
+	if AttrTableZero==me.Match(Type) {
+		log.Info("code %s and type %s should match, but is %s",
+			me.ToString(), 
+			Type.ToString(),
+			AttrTableZero.ToString())
+		
+		return false
+	}
+	
+	return true
 }
 
 func (me EPktCode) IsMust(Type EAttrType) bool {

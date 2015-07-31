@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+// http://blog.csdn.net/liang13664759/article/details/1574367
+
 const AuthSize = 16
 
 var pktAuthSeq uint16 = 0

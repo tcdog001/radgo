@@ -21,16 +21,21 @@ func (me *Attr) IsGood() bool {
 	return me.Type.IsGoodLength(me.Len) && me.Type.IsGoodValue(me.Number)
 }
 
+func (me *Attr) GetString() []byte {
+	return me.Value[:me.Len-2]
+}
+	
 func (me *Attr) SetString(Value []byte) error {
 	Type := me.Type
 	
 	// check value type
 	if !Type.ValueType().IsString() {
+		log.Info("attr %s value is not string", Type.ToString())
 		return Error
 	}
 	
 	// check length
-	Len := byte(len(Value))
+	Len := 2 + byte(len(Value))
 	if !Type.IsGoodLength(Len) {
 		return Error
 	}
@@ -83,7 +88,7 @@ func (me *Attr) ToBinary(bin []byte) error {
 	if me.Type.ValueType().IsNumber() {
 		binary.BigEndian.PutUint32(bin[2:], me.Number)
 	} else {
-		copy(bin[2:], me.Value[:me.Len-2])
+		copy(bin[2:], me.GetString())
 	}
 	
 	return nil
