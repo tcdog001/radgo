@@ -30,7 +30,7 @@ func (me *Attr) SetString(Value []byte) error {
 	
 	// check value type
 	if !Type.ValueType().IsString() {
-		log.Info("attr %s value is not string", Type.ToString())
+		log.Error("attr %s value is not string", Type.ToString())
 		return Error
 	}
 	

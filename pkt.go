@@ -7,11 +7,11 @@ import (
 )
 
 const (
+	PktHdrSize 		= 20
+	
 	PktLengthMin 	= 20
 	PktLengthMax 	= 4096
 )
-
-const PktHdrSize 	= 20
 
 var pktId byte = 0
 
@@ -32,10 +32,10 @@ type Header struct {
 
 func isGoodPktLength(Len uint16) bool{
 	if Len < PktLengthMin || Len > PktLengthMax {
-		log.Info("pkt length min is %d, max is %d, the Len is %d",
+		log.Error("pkt length is %d, should [%d, %d]",
+			Len,
 			PktLengthMin,
-			PktLengthMax,
-			Len)
+			PktLengthMax)
 		
 		return false
 	}
@@ -49,15 +49,19 @@ func (me *Header) IsGood() bool {
 
 func (me *Header) ToBinary(bin []byte) error {
 	if nil==me {
-		return Error
+		log.Error("empty packet")
+		
+		return ErrNilObj
 	}
 	
 	if !me.IsGood() {
-		return Error
+		return ErrBadObj
 	}
 	
 	if len(bin) < int(me.Len) {
-		return Error
+		log.Error("packet==>bin, not enough space")
+		
+		return ErrNoSpace
 	}
 	
 	bin[0] = byte(me.Code)
@@ -70,11 +74,15 @@ func (me *Header) ToBinary(bin []byte) error {
 
 func (me *Header) FromBinary(bin []byte) error {
 	if nil==me {
-		return Error
+		log.Error("empty packet")
+		
+		return ErrNilObj
 	}
 	
 	if len(bin) < PktHdrSize {
-		return Error
+		log.Error("packet buffer is tool short")
+		
+		return ErrTooShortBuffer
 	}
 	
 	code := EPktCode(bin[0])
@@ -189,7 +197,7 @@ func (me *Packet) CheckMust() error {
 		
 		// if the code is must, but attr is empty
 		if me.Code.IsMust(i) && !attr.IsGood() {
-			log.Info("attr type %s must match code %s, but attr is bad",
+			log.Error("attr type %s must match code %s, but attr is bad",
 				i.ToString(),
 				me.Code.ToString())
 				

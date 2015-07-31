@@ -24,11 +24,11 @@ func (me EAtcValue) Int() int {
 
 func (me EAtcValue) IsGood() bool {
 	if !IsGoodEnum(me) {
-		log.Info("bad %s %d", me.Tag(), me)
+		log.Error("bad attr(%s) value(%d)", me.Tag(), me)
 		
 		return false
 	} else if 0==len(atcBind[me]) {
-		log.Info("no support %s %d", me.Tag(), me)
+		log.Error("no support attr(%s) value(%d)", me.Tag(), me)
 		
 		return false
 	}

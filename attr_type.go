@@ -24,10 +24,10 @@ func (me EAttrType) Int() int {
 
 func (me EAttrType) IsGood() bool {
 	if me < AttrTypeBegin ||  me > AttrTypeEnd {
-		log.Info("min attr is %d, max attr is %d, this attr is %d", 
+		log.Error("attr type is %d, should [%d, %d)",
+			me,
 			AttrTypeBegin,
-			AttrTypeEnd,
-			me)
+			AttrTypeEnd)
 		
 		return false
 	}
@@ -36,16 +36,18 @@ func (me EAttrType) IsGood() bool {
 }
 
 func (me EAttrType) ToString() string {
-	if me.IsGood() {
-		return attrTypeBind[me].name
+	if !me.IsGood() {
+		return Empty
 	}
 	
-	return Empty
+	return attrTypeBind[me].name
 }
 
 func (me *EAttrType) FromString(s string) error {
 	v, ok := attrTypeMap[s]
 	if !ok {
+		log.Error("bad attr type string", s)
+		
 		return Error
 	}
 	
@@ -66,11 +68,11 @@ func (me EAttrType) IsGoodLength(Len byte) bool {
 		return false
 	} else if Len < (attrTypeBind[me].min + 2) || 
 			  Len > (attrTypeBind[me].max + 2) {
-		log.Info("attr(%s) min is %d, max is %d, but Len is %d", 
+		log.Error("attr(%s) Len is %d, should [%d, %d]", 
 			me.ToString(),
+			Len - 2,
 			attrTypeBind[me].min,
-			attrTypeBind[me].max,
-			Len - 2)
+			attrTypeBind[me].max)
 			
 		return false
 	}

@@ -19,6 +19,9 @@ func (me AttrUserPassword) isAlign() bool {
 func (me AttrUserPassword) Block(idx int) []byte {
 	count := me.Count()
 	if idx<0 || idx>=count {
+		log.Error("bad user password block index(%d), should [%d, %d)", 
+			idx, 0, count)
+		
 		return nil
 	} else if idx < count-1 || me.isAlign() {
 		return me[idx*passBlockSize : (idx+1)*passBlockSize]

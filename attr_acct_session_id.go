@@ -28,9 +28,23 @@ func (me *SessionId) Init(mac Mac) {
 	me.Unix = uint64(time.Now().Unix())
 }
 
-func (me *SessionId) ToBinary(bin []byte) error {
-	if len(bin) < AcctSessionIdLength {
+func (me *SessionId) checkLengh(bin []byte) error {
+	Len := len(bin)
+	
+	if Len < AcctSessionIdLength {
+		log.Error("SessionId bin length is %d, must >= %d",
+			Len,
+			AcctSessionIdLength)
+		
 		return Error
+	}
+		
+	return nil
+}
+
+func (me *SessionId) ToBinary(bin []byte) error {
+	if err := me.checkLengh(bin); nil!=err {
+		return err
 	}
 	
 	copy(bin, me.Mac[:])
@@ -42,8 +56,8 @@ func (me *SessionId) ToBinary(bin []byte) error {
 }
 
 func (me *SessionId) FromBinary(bin []byte) error {
-	if len(bin) < AcctSessionIdLength {
-		return Error
+	if err := me.checkLengh(bin); nil!=err {
+		return err
 	}
 	
 	copy(me.Mac[:], bin)
