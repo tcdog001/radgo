@@ -131,7 +131,7 @@ func (me *client) initAuth(r IAuth) error {
 		},
 		{
 			Type:CalledStationId,
-			Value:[]byte(MakeCalledStationId(r.DevMac(), r.SSID())),
+			Value:MakeCalledStationId(r.DevMac(), r.SSID()),
 		},
 		{
 			Type:CallingStationId,
@@ -189,7 +189,7 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 		},
 		{
 			Type:CalledStationId,
-			Value:[]byte(MakeCalledStationId(r.DevMac(), r.SSID())),
+			Value:MakeCalledStationId(r.DevMac(), r.SSID()),
 		},
 		{
 			Type:CallingStationId,

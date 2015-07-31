@@ -87,3 +87,80 @@ var atcBind = [atcEnd]string{
 	AtcUserError:		"User Error",
 	AtcHostRequest:		"Host Request",
 }
+
+// device deauth resaon
+type DeauthReason uint32
+
+func (me DeauthReason) Tag() string {
+	return "Dev-Deauth-Reason"
+}
+
+func (me DeauthReason) Begin() int {
+	return int(DeauthReasonBegin)
+}
+
+func (me DeauthReason) End() int {
+	return int(DeauthReasonEnd)
+}
+
+func (me DeauthReason) Int() int {
+	return int(me)
+}
+
+func (me DeauthReason) IsGood() bool {
+	if !IsGoodEnum(me) {
+		log.Error("bad %s(%d)", me.Tag(), me)
+		
+		return false
+	} else if 0==len(drBind[me]) {
+		log.Error("no support %s(%d)", me.Tag(), me)
+		
+		return false
+	}
+	
+	return true
+}
+
+func (me DeauthReason) ToString() string {
+	var b EnumBinding = drBind[:]
+
+	return b.EntryShow(me)
+}
+
+func (me DeauthReason) TerminateCause() uint32 {
+	return uint32(ressonToCause[me])
+}
+
+const (
+	DeauthReasonBegin 		DeauthReason = 0
+	
+	DeauthReasonNone		DeauthReason = 0
+	DeauthReasonAuto		DeauthReason = 1
+	DeauthReasonOnlineTime 	DeauthReason = 2
+	DeauthReasonFlowLimit 	DeauthReason = 3
+	DeauthReasonAdmin		DeauthReason = 4
+	DeauthReasonAging 		DeauthReason = 5
+	DeauthReasonInitiative 	DeauthReason = 6
+	
+	DeauthReasonEnd 		DeauthReason = 7
+)
+
+var drBind = [DeauthReasonEnd]string{
+	DeauthReasonNone:		"None",
+	DeauthReasonAuto:		"Auto",
+	DeauthReasonOnlineTime:	"OnlineTimeOut",
+	DeauthReasonFlowLimit:	"FlowLimit",
+	DeauthReasonAdmin:		"Admin",
+	DeauthReasonAging:		"IdleTimeOut",
+	DeauthReasonInitiative:	"Initiative",
+}
+
+var ressonToCause = [DeauthReasonEnd]EAtcValue{
+	DeauthReasonNone:		AtcUserError,
+	DeauthReasonAuto:		AtcUserError,
+	DeauthReasonOnlineTime:	AtcSessionTimeout,
+	DeauthReasonFlowLimit:	AtcLostService, // need define new cause ???
+	DeauthReasonAdmin:		AtcAdminReset,
+	DeauthReasonAging:		AtcIdleTimeout,
+	DeauthReasonInitiative:	AtcUserRequest,
+}
