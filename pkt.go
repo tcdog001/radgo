@@ -92,11 +92,11 @@ func (me *Header) FromBinary(bin []byte) error {
 	
 	Len := binary.BigEndian.Uint16(bin[2:])
 	if !isGoodPktLength(Len) {
-		return Error
+		return ErrBadPktLen
 	}
 	
 	if len(bin) < int(Len) {
-		return Error
+		return ErrPktLenNoMatchBufferLen
 	}
 	
 	me.Code = code

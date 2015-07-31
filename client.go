@@ -379,7 +379,7 @@ func (me *client) acct(r IAcct, action EAastValue) (bool, error) {
 	return true, nil
 }
 
-func ClientSessionId(mac Mac, session []byte) error{
+func ClientSessionId(mac Mac /* in */, session []byte /* out */) error{
 	s := &SessionId{}
 	s.Init(mac)
 	
