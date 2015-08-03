@@ -160,7 +160,7 @@ func (me *Attr) FromBinary(bin []byte) error {
 			me.Len,
 			me.Number)
 	} else {
-		copy(me.Value[:], bin[2:Len-2])
+		copy(me.Value[:], bin[2:Len])
 		
 		log.Info("read attr(%s) Len(%d) String(%d)",
 			me.Type.ToString(),

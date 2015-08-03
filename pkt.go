@@ -318,7 +318,7 @@ func (me *Packet) Policy() *Policy {
 	attr = me.Attrs[Class]
 	if attr.IsGood() {
 		class := AttrClass(attr.GetString())
-		
+
 		policy.UpRateMax 	= class.UpRateMax()
 		policy.UpRateAvg 	= class.UpRateAvg()
 		policy.DownRateMax 	= class.DownRateMax()
