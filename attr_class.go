@@ -14,7 +14,7 @@ func (me AttrClass) UpRateMax() uint32 {
 		return uint32(v)
 	}
 	
-	log.Warning("bad attr class UpRateMax(%s)", s)
+	log.Error("bad attr class UpRateMax(%s)", s)
 	
 	return 0
 }
@@ -26,7 +26,7 @@ func (me AttrClass) UpRateAvg() uint32 {
 		return uint32(v)
 	}
 	
-	log.Warning("bad attr class UpRateAvg(%s)", s)
+	log.Error("bad attr class UpRateAvg(%s)", s)
 	
 	return 0
 }
@@ -38,7 +38,7 @@ func (me AttrClass) DownRateMax() uint32 {
 		return uint32(v)
 	}
 	
-	log.Warning("bad attr class DownRateMax(%s)", s)
+	log.Error("bad attr class DownRateMax(%s)", s)
 	
 	return 0
 }
@@ -50,7 +50,7 @@ func (me AttrClass) DownRateAvg() uint32 {
 		return uint32(v)
 	}
 	
-	log.Warning("bad attr class DownRateAvg(%s)", s)
+	log.Error("bad attr class DownRateAvg(%s)", s)
 	
 	return 0
 }
