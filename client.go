@@ -327,7 +327,7 @@ func (me *client) auth(r IAuth) (*Policy, error) {
 	
 	fmt.Println("auth", 6)
 	p := &me.response
-	if err := p.FromBinary(me.bin[:]); nil!=err {
+	if err := p.FromBinary(me.bin[:me.rlen]); nil!=err {
 		return nil, me.debugError(err)
 	}
 	
@@ -368,7 +368,7 @@ func (me *client) acct(r IAcct, action EAastValue) (bool, error) {
 	}
 	
 	p := &me.response
-	if err := p.FromBinary(me.bin[:]); nil!=err {
+	if err := p.FromBinary(me.bin[:me.rlen]); nil!=err {
 		return false, me.debugError(err)
 	}
 	

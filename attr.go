@@ -18,15 +18,27 @@ type Attr struct {
 
 // me is full
 func (me *Attr) IsGood() bool {
+	if nil==me {
+		return false
+	}
+	
 	return me.Type.IsGoodLength(me.Len) && me.Type.IsGoodValue(me.Number)
 }
 
 func (me *Attr) GetString() []byte {
+	if nil==me {
+		return nil
+	}
+	
 	return me.Value[:me.Len-2]
 }
 	
 func (me *Attr) SetString(Value []byte) error {
 	Type := me.Type
+	
+	if nil==me {
+		return ErrNilObj
+	}
 	
 	// check value type
 	if !Type.ValueType().IsString() {
@@ -47,6 +59,10 @@ func (me *Attr) SetString(Value []byte) error {
 }
 
 func (me *Attr) SetNumber(Value uint32) error {
+	if nil==me {
+		return ErrNilObj
+	}
+	
 	// check value type
 	if !me.Type.ValueType().IsNumber() {
 		return Error
@@ -75,11 +91,16 @@ func (me *Attr) SetNumber(Value uint32) error {
 // 1. me put into bin
 func (me *Attr) ToBinary(bin []byte) error {
 	if nil==me {
-		return Error
+		return ErrNilObj
 	}
 	
-	if !me.IsGood() || me.Len > byte(len(bin)) {
+	if !me.IsGood() {
 		return Error
+	} else if me.Len > byte(len(bin)) {
+		log.Error("attr(%s) Len(%d) < bin Len(%d)",
+			me.Type.ToString(),
+			me.Len,
+			len(bin))
 	}
 	
 	bin[0] = byte(me.Type)
@@ -87,8 +108,18 @@ func (me *Attr) ToBinary(bin []byte) error {
 	
 	if me.Type.ValueType().IsNumber() {
 		binary.BigEndian.PutUint32(bin[2:], me.Number)
+		
+		log.Info("write attr(%s) Len(%d) Number(%d)",
+			me.Type.ToString(),
+			me.Len,
+			me.Number)
 	} else {
 		copy(bin[2:], me.GetString())
+		
+		log.Info("write attr(%s) Len(%d) String(%d)",
+			me.Type.ToString(),
+			me.Len,
+			me.Value[:me.Len-2])
 	}
 	
 	return nil
@@ -103,12 +134,18 @@ func (me *Attr) ToBinary(bin []byte) error {
 // 1. *me is full
 func (me *Attr) FromBinary(bin []byte) error {
 	if nil==me {
-		return Error
+		return ErrNilObj
 	}
 	
 	Type := EAttrType(bin[0])
 	Len  := bin[1]
-	if !Type.IsGoodLength(Len) || Len > byte(len(bin)) {
+	if !Type.IsGoodLength(Len) {
+		return Error
+	} else if Len > byte(len(bin)) {
+		log.Error("bin attr(%s) Len(%d) < bin Len(%d)",
+			Type.ToString(),
+			Len,
+			len(bin))
 		return Error
 	}
 	
@@ -117,8 +154,18 @@ func (me *Attr) FromBinary(bin []byte) error {
 	
 	if Type.ValueType().IsNumber() {
 		me.Number = binary.BigEndian.Uint32(bin[2:])
+		
+		log.Info("read attr(%s) Len(%d) Number(%d)",
+			me.Type.ToString(),
+			me.Len,
+			me.Number)
 	} else {
 		copy(me.Value[:], bin[2:Len-2])
+		
+		log.Info("read attr(%s) Len(%d) String(%d)",
+			me.Type.ToString(),
+			me.Len,
+			me.Value[:me.Len-2])
 	}
 	
 	if !Type.IsGoodValue(me.Number) {

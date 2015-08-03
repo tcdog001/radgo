@@ -116,7 +116,7 @@ func (me *Packet) Init() {
 	me.Len = PktHdrSize
 }
 
-func (me *Packet) attr(Type EAttrType) (*Attr, bool) {
+func (me *Packet) attr(Type EAttrType) (*Attr, bool /* created */) {
 	if nil!=me.Attrs[Type] {
 		return me.Attrs[Type], false
 	}
@@ -196,7 +196,7 @@ func (me *Packet) CheckMust() error {
 		attr := me.Attrs[i]
 		
 		// if the code is must, but attr is empty
-		if me.Code.IsMust(i) && !attr.IsGood() {
+		if me.Code.IsMust(i) && nil!=attr && !attr.IsGood() {
 			log.Error("attr type %s must match code %s, but attr is bad",
 				i.ToString(),
 				me.Code.ToString())
@@ -275,7 +275,7 @@ func (me *Packet) FromBinary(bin []byte) error {
 
 	// bin==>attr
 	for len(bin) > 0 {
-		attr := me.Attrs[bin[0]]
+		attr, _ := me.attr(EAttrType(bin[0]))
 		
 		if err:=attr.FromBinary(bin); nil!=err {
 			return err
