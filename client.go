@@ -4,7 +4,6 @@ import (
 	. "asdf"
 	"time"
 	"net"
-	"fmt"
 )
 
 type IAuth interface {
@@ -320,23 +319,19 @@ func (me *client) auth(r IAuth) (*Policy, error) {
 		return nil, me.debugError(err)
 	}
 	
-	fmt.Println("auth", 5)
 	if err := me.net(); nil!=err {
 		return nil, me.debugError(err)
 	}
 	
-	fmt.Println("auth", 6)
 	p := &me.response
 	if err := p.FromBinary(me.bin[:me.rlen]); nil!=err {
 		return nil, me.debugError(err)
 	}
 	
-	fmt.Println("auth", 7)
 	if AccessAccept!=p.Code {
 		return nil, me.debugError(Error)
 	}
 	
-	fmt.Println("auth", 8)
 	r.SetClass(p.Attrs[Class].GetString())
 	
 	return p.Policy(), nil
