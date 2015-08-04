@@ -248,6 +248,10 @@ func (me *Packet) ToBinary(bin []byte) error {
 			continue
 		}
 		
+		if nil==ab {
+			return ErrNilBuffer
+		}
+		
 		if err:=attr.ToBinary(ab.Bin()); nil!=err {
 			return err
 		}
@@ -275,7 +279,7 @@ func (me *Packet) FromBinary(bin []byte) error {
 
 	ab := AttrBinary(bin[PktHdrSize:])
 	// bin==>attr
-	for len(ab) > 0 {
+	for nil!=ab && len(ab) > 0 {
 		attr, _ := me.attr(ab.Type())
 		
 		if err:=attr.FromBinary(ab.Bin()); nil!=err {
