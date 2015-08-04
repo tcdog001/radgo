@@ -80,7 +80,7 @@ func (me EAttrType) IsGoodLength(Len byte) bool {
 	return true
 }
 
-func (me EAttrType) IsGoodValue(Value uint32) bool {
+func (me EAttrType) IsGoodNumber(Value uint32) bool {
 	if !me.IsGood() {
 		return false
 	}

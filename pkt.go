@@ -239,8 +239,8 @@ func (me *Packet) ToBinary(bin []byte) error {
 	if err := me.Header.ToBinary(bin); nil!=err {
 		return err
 	}
-	bin = bin[PktHdrSize:]
 	
+	ab := AttrBinary(bin[PktHdrSize:])
 	// attr==>bin
 	for i:=AttrTypeBegin; i<AttrTypeEnd; i++ {
 		attr := me.Attrs[i]
@@ -248,10 +248,11 @@ func (me *Packet) ToBinary(bin []byte) error {
 			continue
 		}
 		
-		if err:=attr.ToBinary(bin); nil!=err {
+		if err:=attr.ToBinary(ab.Bin()); nil!=err {
 			return err
 		}
-		bin = bin[attr.Len:]
+		
+		ab = ab.Next()
 	}
 	
 	return nil
@@ -271,13 +272,13 @@ func (me *Packet) FromBinary(bin []byte) error {
 	if err:=me.Header.FromBinary(bin); nil!=err {
 		return err
 	}
-	bin = bin[PktHdrSize:]
 
+	ab := AttrBinary(bin[PktHdrSize:])
 	// bin==>attr
-	for len(bin) > 0 {
-		attr, _ := me.attr(EAttrType(bin[0]))
+	for len(ab) > 0 {
+		attr, _ := me.attr(ab.Type())
 		
-		if err:=attr.FromBinary(bin); nil!=err {
+		if err:=attr.FromBinary(ab.Bin()); nil!=err {
 			return err
 		}
 		
@@ -285,9 +286,8 @@ func (me *Packet) FromBinary(bin []byte) error {
 			return Error
 		}
 		
-		bin = bin[attr.Len:]
-		
-		me.Len += uint16(attr.Len)
+		me.Len += uint16(ab.Len())
+		ab = ab.Next()
 	}
 	
 	if err:=me.CheckMust(); nil!=err {

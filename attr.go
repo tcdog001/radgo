@@ -9,6 +9,52 @@ const (
 	AttrLengthMax = 255
 )
 
+type AttrBinary []byte
+
+func (me AttrBinary) Bin() []byte {
+	return []byte(me)
+}
+
+func (me AttrBinary) Type() EAttrType {
+	return EAttrType(me[0])
+}
+
+func (me AttrBinary) Len() byte {
+	return me[1]
+}
+
+func (me AttrBinary) Value() []byte {
+	return me[2:me.Len()]
+}
+
+func (me AttrBinary) Next() AttrBinary {
+	Len := byte(len(me))
+	
+	if Len <= me.Len() {
+		return nil
+	}
+	
+	return me[me.Len():]
+}
+
+func (me AttrBinary) Number() uint32 {
+	return binary.BigEndian.Uint32(me.Value())	
+}
+
+func (me AttrBinary) SetNumber(Type EAttrType, Number uint32) {
+	me[0] = byte(Type)
+	me[1] = 6
+	
+	binary.BigEndian.PutUint32(me.Value(), Number)
+}
+
+func (me AttrBinary) SetString(Type EAttrType, Value []byte) {
+	me[0] = byte(Type)
+	me[1] = 2 + byte(len(Value))
+	
+	copy(me.Value(), Value)
+}
+
 type Attr struct {
 	Type 	EAttrType
 	Len 	byte
@@ -22,7 +68,7 @@ func (me *Attr) IsGood() bool {
 		return false
 	}
 	
-	return me.Type.IsGoodLength(me.Len) && me.Type.IsGoodValue(me.Number)
+	return me.Type.IsGoodLength(me.Len) && me.Type.IsGoodNumber(me.Number)
 }
 
 func (me *Attr) GetString() []byte {
@@ -32,7 +78,7 @@ func (me *Attr) GetString() []byte {
 	
 	return me.Value[:me.Len-2]
 }
-	
+
 func (me *Attr) SetString(Value []byte) error {
 	Type := me.Type
 	
@@ -52,8 +98,13 @@ func (me *Attr) SetString(Value []byte) error {
 		return Error
 	}
 	
-	copy(me.Value[:], Value)
 	me.Len = Len
+	copy(me.GetString(), Value)
+
+	log.Info("set attr(%s) Len(%d) String(%s)",
+		Type.ToString(),
+		Len,
+		me.GetString())
 	
 	return nil
 }
@@ -69,12 +120,16 @@ func (me *Attr) SetNumber(Value uint32) error {
 	}
 	
 	// check value
-	if !me.Type.IsGoodValue(Value) {
+	if !me.Type.IsGoodNumber(Value) {
 		return Error
 	}
 	
-	me.Number = Value
 	me.Len = 6
+	me.Number = Value
+
+	log.Info("set attr(%s) Number(%d)",
+		me.Type.ToString(),
+		me.Number)
 	
 	return nil
 }
@@ -94,32 +149,36 @@ func (me *Attr) ToBinary(bin []byte) error {
 		return ErrNilObj
 	}
 	
+	Len := byte(len(bin))
+	
 	if !me.IsGood() {
-		return Error
-	} else if me.Len > byte(len(bin)) {
+		return ErrBadObj
+	} 
+	
+	if me.Len > Len {
 		log.Error("attr(%s) Len(%d) < bin Len(%d)",
 			me.Type.ToString(),
 			me.Len,
-			len(bin))
+			Len)
+		
+		return ErrTooShortBuffer
 	}
 	
-	bin[0] = byte(me.Type)
-	bin[1] = me.Len
+	ab := AttrBinary(bin)
 	
 	if me.Type.ValueType().IsNumber() {
-		binary.BigEndian.PutUint32(bin[2:], me.Number)
-		
-		log.Info("write attr(%s) Len(%d) Number(%d)",
+		ab.SetNumber(me.Type, me.Number)
+	
+		log.Info("write attr(%s) Number(%d)",
 			me.Type.ToString(),
-			me.Len,
 			me.Number)
 	} else {
-		copy(bin[2:], me.GetString())
-		
-		log.Info("write attr(%s) Len(%d) String(%d)",
+		ab.SetString(me.Type, me.GetString())
+
+		log.Info("write attr(%s) Len(%d) String(%s)",
 			me.Type.ToString(),
 			me.Len,
-			me.Value[:me.Len-2])
+			me.GetString())
 	}
 	
 	return nil
@@ -137,11 +196,15 @@ func (me *Attr) FromBinary(bin []byte) error {
 		return ErrNilObj
 	}
 	
-	Type := EAttrType(bin[0])
-	Len  := bin[1]
+	ab := AttrBinary(bin)
+	
+	Type := ab.Type()
+	Len  := ab.Len()
 	if !Type.IsGoodLength(Len) {
-		return Error
-	} else if Len > byte(len(bin)) {
+		return ErrBadObj
+	} 
+	
+	if Len > byte(len(bin)) {
 		log.Error("bin attr(%s) Len(%d) < bin Len(%d)",
 			Type.ToString(),
 			Len,
@@ -153,23 +216,23 @@ func (me *Attr) FromBinary(bin []byte) error {
 	me.Len  = Len
 	
 	if Type.ValueType().IsNumber() {
-		me.Number = binary.BigEndian.Uint32(bin[2:])
+		me.Number = ab.Number()
+		
+		if !Type.IsGoodNumber(me.Number) {
+			return Error
+		}
 		
 		log.Info("read attr(%s) Len(%d) Number(%d)",
 			me.Type.ToString(),
 			me.Len,
 			me.Number)
 	} else {
-		copy(me.Value[:], bin[2:Len])
+		copy(me.GetString(), ab.Value())
 		
-		log.Info("read attr(%s) Len(%d) String(%d)",
+		log.Info("read attr(%s) Len(%d) String(%s)",
 			me.Type.ToString(),
 			me.Len,
-			me.Value[:me.Len-2])
-	}
-	
-	if !Type.IsGoodValue(me.Number) {
-		return Error
+			me.GetString())
 	}
 	
 	return nil
