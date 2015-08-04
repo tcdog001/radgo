@@ -9,6 +9,7 @@ const (
 	AttrLengthMax = 255
 )
 
+
 type AttrBinary []byte
 
 func (me AttrBinary) Bin() []byte {
