@@ -177,9 +177,6 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 	
 	q.Code = AccountingRequest
 	q.Id	= PktId()
-	if err := PktAuth(q.Auth[:]).AcctRequest(me.bin[:], r.Secret()); nil!=err {
-		return me.debugError(err)
-	}
 	
 	if err := q.SetAttrStringList([]AttrString{
 		{
@@ -355,6 +352,10 @@ func (me *client) acct(r IAcct, action EAastValue) (bool, error) {
 	
 	q := &me.request
 	if err := q.ToBinary(me.bin[:]); nil!=err {
+		return false, me.debugError(err)
+	}
+	
+	if err := PktAuth(me.bin[4:PktHdrSize]).AcctRequest(me.bin[:me.request.Len], r.Secret()); nil!=err {
 		return false, me.debugError(err)
 	}
 	

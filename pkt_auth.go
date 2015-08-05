@@ -59,14 +59,14 @@ func (me *privateAuth) FromBinary(bin []byte) error {
 type PktAuth []byte
 
 func (me PktAuth) md5(pkt []byte, auth PktAuth, secret []byte) error {
-	md5 := md5.New()
+	m := md5.New()
 	
-	md5.Write(pkt[:4]) 	// Code+ID+Length	
-	md5.Write(auth)		// auth
-	md5.Write(pkt[PktHdrSize:]) // Attributes
-	md5.Write(secret)	// Key
+	m.Write(pkt[:4]) 	// Code+ID+Length	
+	m.Write(auth)		// auth
+	m.Write(pkt[PktHdrSize:]) // Attributes
+	m.Write(secret)	// Key
 
-	sum := md5.Sum(nil)
+	sum := m.Sum(nil)
 	
 	if len(me) < len(sum) {
 		return Error
@@ -94,9 +94,9 @@ func (me PktAuth) AuthReponse(pkt []byte, req PktAuth, secret []byte) error {
 // AcctRequest = MD5(Code+ID+Length+16ZeroOctets+Attributes+Key)
 // pkt is the Accounting-Request packet
 func (me PktAuth) AcctRequest(pkt []byte, secret []byte) error {
-	zero := PktAuth{}
+	zero := [AuthSize]byte{}
 	
-	return me.md5(pkt, zero, secret)
+	return me.md5(pkt, PktAuth(zero[:]), secret)
 }
 
 // AcctReponse = MD5(Code+ID+Length+AcctRequest+Attributes+Key)

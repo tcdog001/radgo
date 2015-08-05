@@ -61,7 +61,7 @@ var user = &User{
 	reason:uint32(AtcUserRequest),
 }
 
-func testInit() {
+func testInit(t *testing.T) {
 	SetLogger(&mlog)
 	
 	//param init
@@ -207,13 +207,47 @@ func (me *plog) Debug(format string, v ...interface{}) {
 	fmt.Printf(format + Crlf, v...)
 }
 
-func TestAuth(t *testing.T){
-	testInit()
-	
+func testAuth(t *testing.T){
+	t.Log("testing auth start ...")
 	fmt.Println("param", param)
 	fmt.Println("user", user)
 	
-	policy, _ := ClientAuth(user)
-	
+	policy, err := ClientAuth(user)
+	if nil!=err {
+		t.Fatal("test auth error", err)
+	}
 	fmt.Println("policy", policy)
+	t.Log("test auth PASS")
+}
+
+func testAcctStart(t *testing.T){
+	t.Log("testing acct start ...")
+	if _, err := ClientAcctStart(user); nil!=err {
+		t.Fatal("test acct start error:", err)
+	}
+	t.Log("test acct start PASS")
+}
+
+func testAcctUpdate(t *testing.T){
+	t.Log("testing acct update ...")
+	if _, err := ClientAcctUpdate(user); nil!=err {
+		t.Fatal("test acct update error:", err)
+	}
+	t.Log("test acct update PASS")
+}
+
+func testAcctStop(t *testing.T){
+	t.Log("testing acct stop ...")
+	if _, err := ClientAcctStop(user); nil!=err {
+		t.Fatal("test acct stop error:", err)
+	}
+	t.Log("test acct stop PASS")	
+}
+
+func TestClient(t *testing.T){
+	testInit(t)
+	testAuth(t)
+	testAcctStart(t)
+	testAcctUpdate(t)
+	testAcctStop(t)
 }
