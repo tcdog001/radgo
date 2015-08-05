@@ -34,6 +34,16 @@ func (me EAttrTableValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAttrTableValue) FromString(Name string) error {
+	if e, ok := attrTableMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 // 0     This attribute MUST NOT be present in packet.
 // 0+    Zero or more instances of this attribute MAY be present in packet.
 // 0-1   Zero or one instance of this attribute MAY be present in packet.
@@ -54,4 +64,12 @@ var attrTableBind = [attrTableEnd]string{
 	AttrTableZeroMore:	"ZeroOrMore",
 	AttrTableZeroOne:	"ZeroOrOne",
 	AttrTableOne:		"One",
+}
+
+var attrTableMap = map[string]EAttrTableValue{}
+
+func initAttrTable() {
+	for i:=attrTableBegin; i<attrTableEnd; i++ {
+		attrTableMap[attrTableBind[i]] = i
+	}
 }

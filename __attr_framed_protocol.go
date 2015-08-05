@@ -34,6 +34,16 @@ func (me EAfpValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAfpValue) FromString(Name string) error {
+	if e, ok := afpMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	afpBegin		EAfpValue = 1
 	
@@ -56,4 +66,13 @@ var afpBind = [afpEnd]string{
 	AfpIpx:		"Xylogics proprietary IPX/SLIP",
 	AfpX75:		"X.75 Synchronous",
 }
+
+var afpMap = map[string]EAfpValue{}
+
+func initAfp() {
+	for i:=afpBegin; i<afpEnd; i++ {
+		afpMap[afpBind[i]] = i
+	}
+}
+
 

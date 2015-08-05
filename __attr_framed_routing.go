@@ -34,6 +34,16 @@ func (me EAfrValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAfrValue) FromString(Name string) error {
+	if e, ok := afrMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 // Framed-Routing value
 const (
 	afrBegin			EAfrValue = 0
@@ -51,4 +61,12 @@ var afrBind = [afpEnd]string{
 	AfrSend:			"Send routing packets",
 	AfrListen:			"Listen for routing packets",
 	AfrSendAndListen:	"Send and Listen",
+}
+
+var afrMap = map[string]EAfrValue{}
+
+func initAfr() {
+	for i:=afrBegin; i<afrEnd; i++ {
+		afrMap[afrBind[i]] = i
+	}
 }

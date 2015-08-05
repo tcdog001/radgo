@@ -4,48 +4,66 @@ import (
 	. "asdf"
 )
 
-type EAfrValue uint32
+type EAaaValue uint32
 
-func (me EAfrValue) Tag() string {
+func (me EAaaValue) Tag() string {
 	return "Acct-Authentic"
 }
 
-func (me EAfrValue) Begin() int {
+func (me EAaaValue) Begin() int {
 	return int(aaaBegin)
 }
 
-func (me EAfrValue) End() int {
+func (me EAaaValue) End() int {
 	return int(aaaEnd)
 }
 
-func (me EAfrValue) Int() int {
+func (me EAaaValue) Int() int {
 	return int(me)
 }
 
-func (me EAfrValue) IsGood() bool {
+func (me EAaaValue) IsGood() bool {
 	return IsGoodEnum(me) && 
 		len(aaaBind)==me.End() && 
 		len(aaaBind[me]) > 0
 }
 
-func (me EAfrValue) ToString() string {
+func (me EAaaValue) ToString() string {
 	var b EnumBinding = aaaBind[:]
 
 	return b.EntryShow(me)
 }
 
-const (
-	aaaBegin	EAfrValue = 1
-	
-	AaaRadius	EAfrValue = 1
-	AaaLocal	EAfrValue = 2
-	AaaRemote	EAfrValue = 3
+func (me *EAaaValue) FromString(Name string) error {
+	if e, ok := aaaMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
 
-	aaaEnd		EAfrValue = 4
+	return ErrNoFound
+}
+
+const (
+	aaaBegin	EAaaValue = 1
+	
+	AaaRadius	EAaaValue = 1
+	AaaLocal	EAaaValue = 2
+	AaaRemote	EAaaValue = 3
+
+	aaaEnd		EAaaValue = 4
 )
 
 var aaaBind = [aaaEnd]string{
 	AaaRadius:	"RADIUS",
 	AaaLocal:	"Local",
 	AaaRemote:	"Remote",
+}
+
+var aaaMap = map[string]EAaaValue{}
+
+func initAaa() {
+	for i:=aaaBegin; i<aaaEnd; i++ {
+		aaaMap[aaaBind[i]] = i
+	}
 }

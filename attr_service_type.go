@@ -42,6 +42,16 @@ func (me EAstValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAstValue) FromString(Name string) error {
+	if e, ok := astMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	astBegin				EAstValue = 1
 	
@@ -72,5 +82,13 @@ var astBind = [astEnd]string{
 	AstCallbackNasPrompt:		"Callback NAS Prompt",
 	AstCallCheck:				"Call Check",
 	AstCallbackAdministrative:	"Callback Administrative",
+}
+
+var astMap = map[string]EAstValue{}
+
+func initAst() {
+	for i:=astBegin; i<astEnd; i++ {
+		astMap[astBind[i]] = i
+	}
 }
 

@@ -42,6 +42,16 @@ func (me EAtcValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAtcValue) FromString(Name string) error {
+	if e, ok := atcMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	atcBegin 			EAtcValue = 1
 	
@@ -88,6 +98,14 @@ var atcBind = [atcEnd]string{
 	AtcHostRequest:		"Host Request",
 }
 
+var atcMap = map[string]EAtcValue{}
+
+func initAtc() {
+	for i:=atcBegin; i<atcEnd; i++ {
+		atcMap[atcBind[i]] = i
+	}
+}
+
 // device deauth resaon
 type DeauthReason uint32
 
@@ -127,6 +145,16 @@ func (me DeauthReason) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *DeauthReason) FromString(Name string) error {
+	if e, ok := drMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 func (me DeauthReason) TerminateCause() uint32 {
 	return uint32(ressonToCause[me])
 }
@@ -163,4 +191,12 @@ var ressonToCause = [DeauthReasonEnd]EAtcValue{
 	DeauthReasonAdmin:		AtcAdminReset,
 	DeauthReasonAging:		AtcIdleTimeout,
 	DeauthReasonInitiative:	AtcUserRequest,
+}
+
+var drMap = map[string]DeauthReason{}
+
+func initDeauthReason() {
+	for i:=DeauthReasonBegin; i<DeauthReasonEnd; i++ {
+		drMap[drBind[i]] = i
+	}
 }

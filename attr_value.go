@@ -49,6 +49,16 @@ func (me EAttrValueType) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAttrValueType) FromString(Name string) error {
+	if e, ok := avtMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	avtBegin 		EAttrValueType = 1
 	
@@ -67,4 +77,12 @@ var avtBind = [avtEnd]string{
 	AvtAddress:	"Address",
 	AvtInteger:	"Integer",
 	AvtTime:	"Time",
+}
+
+var avtMap = map[string]EAttrValueType{}
+
+func initAvt() {
+	for i:=avtBegin; i<avtEnd; i++ {
+		avtMap[avtBind[i]] = i
+	}
 }

@@ -34,6 +34,16 @@ func (me EAlsValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAlsValue) FromString(Name string) error {
+	if e, ok := alsMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	alsBegin		EAlsValue = 0
 	
@@ -58,4 +68,12 @@ var alsBind = [alsEnd]string{
 	AlsX25Pad:		"X25-PAD",
 	AlsX25T3Pos:	"X25-T3POS",
 	AlsTcpQuiet:	"TCP Clear Quiet",
+}
+
+var alsMap = map[string]EAlsValue{}
+
+func initAls() {
+	for i:=alsBegin; i<alsEnd; i++ {
+		alsMap[alsBind[i]] = i
+	}
 }

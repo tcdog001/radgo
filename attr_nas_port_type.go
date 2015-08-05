@@ -42,6 +42,16 @@ func (me EAnptValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAnptValue) FromString(Name string) error {
+	if e, ok := anptMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	anptBegin				EAnptValue = 0
 	
@@ -90,5 +100,13 @@ var anptBind = [anptEnd]string{
 	AnptCable:				"Cable",
 	AnptWirelessOther:		"Wireless - Other",
 	AnptIeee80211:			"Wireless - IEEE 802.11",
+}
+
+var anptMap = map[string]EAnptValue{}
+
+func initAnpt() {
+	for i:=anptBegin; i<anptEnd; i++ {
+		anptMap[anptBind[i]] = i
+	}
 }
 

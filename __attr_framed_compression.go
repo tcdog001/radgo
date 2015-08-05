@@ -34,6 +34,16 @@ func (me EAfcValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAfcValue) FromString(Name string) error {
+	if e, ok := afcMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	afcBegin 		EAfcValue = 0
 	
@@ -50,4 +60,12 @@ var afcBind = [afcEnd]string{
 	AfcTcpip:	"VJ TCP/IP header compression",
 	AfcIpx:		"IPX header compression",
 	AfcLzs:		"Stac-LZS compression",
+}
+
+var afcMap = map[string]EAfcValue{}
+
+func initAfc() {
+	for i:=afcBegin; i<afcEnd; i++ {
+		afcMap[afcBind[i]] = i
+	}
 }

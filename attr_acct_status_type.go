@@ -42,6 +42,16 @@ func (me EAastValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAastValue) FromString(Name string) error {
+	if e, ok := aastMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	aastBegin			EAastValue = 1
 	
@@ -62,4 +72,12 @@ var aastBind = [aastEnd]string{
 	AastAccountingOn:	"Accounting-On",
 	AastAccountingOff:	"Accounting-Off",
 	AastFailed:			"Failed",
+}
+
+var aastMap = map[string]EAastValue{}
+
+func initAast() {
+	for i:=aastBegin; i<aastEnd; i++ {
+		aastMap[aastBind[i]] = i
+	}
 }

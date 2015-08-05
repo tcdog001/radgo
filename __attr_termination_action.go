@@ -34,6 +34,16 @@ func (me EAtaValue) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EAtaValue) FromString(Name string) error {
+	if e, ok := ataMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 const (
 	ataBegin			EAtaValue = 0
 	
@@ -46,4 +56,12 @@ const (
 var ataBind = [ataEnd]string{
 	AtaDefault:			"Default",
 	AtaRadiusRequest:	"RADIUS-Request",
+}
+
+var ataMap = map[string]EAtaValue{}
+
+func initAta() {
+	for i:=ataBegin; i<ataEnd; i++ {
+		ataMap[ataBind[i]] = i
+	}
 }
