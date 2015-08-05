@@ -21,5 +21,5 @@ func (me AttrCalledStationId) SSID() []byte {
 }
 
 func MakeCalledStationId(mac []byte, ssid []byte) []byte {
-	return []byte(Mac(mac).ToStringLU() + ":" + string(ssid))
+	return []byte(Mac(mac).ToStringLW() + ":" + string(ssid))
 }
