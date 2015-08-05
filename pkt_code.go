@@ -23,8 +23,8 @@ func (me EPktCode) Int() int {
 }
 
 func (me EPktCode) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(pktCodeBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(pktCodeBind) == me.End() &&
 		len(pktCodeBind[me]) > 0
 }
 
@@ -37,7 +37,7 @@ func (me EPktCode) ToString() string {
 func (me *EPktCode) FromString(Name string) error {
 	if e, ok := pktCodeMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -48,25 +48,25 @@ func (me EPktCode) Match(Type EAttrType) EAttrTableValue {
 	if me.IsGood() && Type.IsGood() {
 		return attrTypeBind[Type].table[me]
 	}
-	
+
 	return AttrTableZero
 }
 
 func (me EPktCode) IsMatch(Type EAttrType) bool {
-	if AttrTableZero==me.Match(Type) {
+	if AttrTableZero == me.Match(Type) {
 		log.Info("code %s and type %s should match, but is %s",
-			me.ToString(), 
+			me.ToString(),
 			Type.ToString(),
 			AttrTableZero.ToString())
-		
+
 		return false
 	}
-	
+
 	return true
 }
 
 func (me EPktCode) IsMust(Type EAttrType) bool {
-	return AttrTableOne==me.Match(Type)
+	return AttrTableOne == me.Match(Type)
 }
 
 func (me EPktCode) NetworkDir() ENetworkDir {
@@ -74,40 +74,40 @@ func (me EPktCode) NetworkDir() ENetworkDir {
 }
 
 const (
-	PktCodeBegin 		EPktCode = 1
-	
-	AccessRequest		EPktCode = 1
-	AccessAccept		EPktCode = 2
-	AccessReject		EPktCode = 3
-	AccountingRequest	EPktCode = 4
-	AccountingResponse	EPktCode = 5
-	AccessChallenge		EPktCode = 11
+	PktCodeBegin EPktCode = 1
 
-	PktCodeEnd			EPktCode = 12
+	AccessRequest      EPktCode = 1
+	AccessAccept       EPktCode = 2
+	AccessReject       EPktCode = 3
+	AccountingRequest  EPktCode = 4
+	AccountingResponse EPktCode = 5
+	AccessChallenge    EPktCode = 11
+
+	PktCodeEnd EPktCode = 12
 )
 
 var pktCodeBind = [PktCodeEnd]string{
-	AccessRequest:		"Access-Request",
-	AccessAccept:		"Access-Accept",
-	AccessReject:		"Access-Reject",
-	AccessChallenge:	"Access-Challenge",
-	AccountingRequest:	"Accounting-Request",
-	AccountingResponse:	"Accounting-Response",
+	AccessRequest:      "Access-Request",
+	AccessAccept:       "Access-Accept",
+	AccessReject:       "Access-Reject",
+	AccessChallenge:    "Access-Challenge",
+	AccountingRequest:  "Accounting-Request",
+	AccountingResponse: "Accounting-Response",
 }
 
 var pktCodeMap = map[string]EPktCode{}
 
 var codeDirBind = [PktCodeEnd]ENetworkDir{
-	AccessRequest:		ToServer,
-	AccessAccept:		ToClient,
-	AccessReject:		ToClient,
-	AccessChallenge:	ToClient,
-	AccountingRequest:	ToServer,
-	AccountingResponse:	ToClient,
+	AccessRequest:      ToServer,
+	AccessAccept:       ToClient,
+	AccessReject:       ToClient,
+	AccessChallenge:    ToClient,
+	AccountingRequest:  ToServer,
+	AccountingResponse: ToClient,
 }
 
 func initPktCode() {
-	for i:=PktCodeBegin; i<PktCodeEnd; i++ {
+	for i := PktCodeBegin; i < PktCodeEnd; i++ {
 		pktCodeMap[pktCodeBind[i]] = i
 	}
 }

@@ -23,8 +23,8 @@ func (me EAfcValue) Int() int {
 }
 
 func (me EAfcValue) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(afcBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(afcBind) == me.End() &&
 		len(afcBind[me]) > 0
 }
 
@@ -37,7 +37,7 @@ func (me EAfcValue) ToString() string {
 func (me *EAfcValue) FromString(Name string) error {
 	if e, ok := afcMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -45,27 +45,27 @@ func (me *EAfcValue) FromString(Name string) error {
 }
 
 const (
-	afcBegin 		EAfcValue = 0
-	
-	AfcNone			EAfcValue = 0
-	AfcTcpip		EAfcValue = 1
-	AfcIpx			EAfcValue = 2
-	AfcLzs 			EAfcValue = 3
+	afcBegin EAfcValue = 0
 
-	afcEnd 			EAfcValue = 4
+	AfcNone  EAfcValue = 0
+	AfcTcpip EAfcValue = 1
+	AfcIpx   EAfcValue = 2
+	AfcLzs   EAfcValue = 3
+
+	afcEnd EAfcValue = 4
 )
 
 var afcBind = [afcEnd]string{
-	AfcNone:	"None",
-	AfcTcpip:	"VJ TCP/IP header compression",
-	AfcIpx:		"IPX header compression",
-	AfcLzs:		"Stac-LZS compression",
+	AfcNone:  "None",
+	AfcTcpip: "VJ TCP/IP header compression",
+	AfcIpx:   "IPX header compression",
+	AfcLzs:   "Stac-LZS compression",
 }
 
 var afcMap = map[string]EAfcValue{}
 
 func initAfc() {
-	for i:=afcBegin; i<afcEnd; i++ {
+	for i := afcBegin; i < afcEnd; i++ {
 		afcMap[afcBind[i]] = i
 	}
 }

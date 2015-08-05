@@ -23,8 +23,8 @@ func (me EAaaValue) Int() int {
 }
 
 func (me EAaaValue) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(aaaBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(aaaBind) == me.End() &&
 		len(aaaBind[me]) > 0
 }
 
@@ -37,7 +37,7 @@ func (me EAaaValue) ToString() string {
 func (me *EAaaValue) FromString(Name string) error {
 	if e, ok := aaaMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -45,25 +45,25 @@ func (me *EAaaValue) FromString(Name string) error {
 }
 
 const (
-	aaaBegin	EAaaValue = 1
-	
-	AaaRadius	EAaaValue = 1
-	AaaLocal	EAaaValue = 2
-	AaaRemote	EAaaValue = 3
+	aaaBegin EAaaValue = 1
 
-	aaaEnd		EAaaValue = 4
+	AaaRadius EAaaValue = 1
+	AaaLocal  EAaaValue = 2
+	AaaRemote EAaaValue = 3
+
+	aaaEnd EAaaValue = 4
 )
 
 var aaaBind = [aaaEnd]string{
-	AaaRadius:	"RADIUS",
-	AaaLocal:	"Local",
-	AaaRemote:	"Remote",
+	AaaRadius: "RADIUS",
+	AaaLocal:  "Local",
+	AaaRemote: "Remote",
 }
 
 var aaaMap = map[string]EAaaValue{}
 
 func initAaa() {
-	for i:=aaaBegin; i<aaaEnd; i++ {
+	for i := aaaBegin; i < aaaEnd; i++ {
 		aaaMap[aaaBind[i]] = i
 	}
 }

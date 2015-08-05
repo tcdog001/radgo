@@ -23,8 +23,8 @@ func (me EAfrValue) Int() int {
 }
 
 func (me EAfrValue) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(afrBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(afrBind) == me.End() &&
 		len(afrBind[me]) > 0
 }
 
@@ -37,7 +37,7 @@ func (me EAfrValue) ToString() string {
 func (me *EAfrValue) FromString(Name string) error {
 	if e, ok := afrMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -46,27 +46,27 @@ func (me *EAfrValue) FromString(Name string) error {
 
 // Framed-Routing value
 const (
-	afrBegin			EAfrValue = 0
-	
-	AfrNone				EAfrValue = 0
-	AfrSend				EAfrValue = 1
-	AfrListen 			EAfrValue = 2
-	AfrSendAndListen	EAfrValue = 3
+	afrBegin EAfrValue = 0
 
-	afrEnd 				EAfrValue = 4
+	AfrNone          EAfrValue = 0
+	AfrSend          EAfrValue = 1
+	AfrListen        EAfrValue = 2
+	AfrSendAndListen EAfrValue = 3
+
+	afrEnd EAfrValue = 4
 )
 
 var afrBind = [afpEnd]string{
-	AfrNone:			"None",
-	AfrSend:			"Send routing packets",
-	AfrListen:			"Listen for routing packets",
-	AfrSendAndListen:	"Send and Listen",
+	AfrNone:          "None",
+	AfrSend:          "Send routing packets",
+	AfrListen:        "Listen for routing packets",
+	AfrSendAndListen: "Send and Listen",
 }
 
 var afrMap = map[string]EAfrValue{}
 
 func initAfr() {
-	for i:=afrBegin; i<afrEnd; i++ {
+	for i := afrBegin; i < afrEnd; i++ {
 		afrMap[afrBind[i]] = i
 	}
 }

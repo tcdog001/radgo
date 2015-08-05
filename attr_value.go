@@ -4,7 +4,7 @@ import (
 	. "asdf"
 )
 
-type EAttrValueType 	int
+type EAttrValueType int
 
 func (me EAttrValueType) Tag() string {
 	return "Attribute-Value-Type"
@@ -23,19 +23,21 @@ func (me EAttrValueType) Int() int {
 }
 
 func (me EAttrValueType) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(avtBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(avtBind) == me.End() &&
 		len(avtBind[me]) > 0
 }
 
 func (me EAttrValueType) IsNumber() bool {
 	switch me {
-		case AvtAddress:fallthrough
-		case AvtInteger:fallthrough
-		case AvtTime:
-			return true
-		default:
-			return false
+	case AvtAddress:
+		fallthrough
+	case AvtInteger:
+		fallthrough
+	case AvtTime:
+		return true
+	default:
+		return false
 	}
 }
 
@@ -52,7 +54,7 @@ func (me EAttrValueType) ToString() string {
 func (me *EAttrValueType) FromString(Name string) error {
 	if e, ok := avtMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -60,29 +62,29 @@ func (me *EAttrValueType) FromString(Name string) error {
 }
 
 const (
-	avtBegin 		EAttrValueType = 1
-	
-	AvtText 		EAttrValueType = 1
-	AvtString		EAttrValueType = 2
-	AvtAddress		EAttrValueType = 3
-	AvtInteger		EAttrValueType = 4
-	AvtTime			EAttrValueType = 5
-	
-	avtEnd 			EAttrValueType = 6
+	avtBegin EAttrValueType = 1
+
+	AvtText    EAttrValueType = 1
+	AvtString  EAttrValueType = 2
+	AvtAddress EAttrValueType = 3
+	AvtInteger EAttrValueType = 4
+	AvtTime    EAttrValueType = 5
+
+	avtEnd EAttrValueType = 6
 )
 
 var avtBind = [avtEnd]string{
-	AvtText:	"Text",
-	AvtString:	"String",
-	AvtAddress:	"Address",
-	AvtInteger:	"Integer",
-	AvtTime:	"Time",
+	AvtText:    "Text",
+	AvtString:  "String",
+	AvtAddress: "Address",
+	AvtInteger: "Integer",
+	AvtTime:    "Time",
 }
 
 var avtMap = map[string]EAttrValueType{}
 
 func initAvt() {
-	for i:=avtBegin; i<avtEnd; i++ {
+	for i := avtBegin; i < avtEnd; i++ {
 		avtMap[avtBind[i]] = i
 	}
 }

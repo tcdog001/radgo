@@ -7,72 +7,73 @@ import (
 )
 
 type Param struct {
-	Secret []byte
+	Secret        []byte
 	NasIdentifier []byte
-	NasIpAddress uint32
-	NasPort uint32
-	NasPortType uint32
-	ServiceType uint32
-	Server string
-	AuthPort string
-	AcctPort string
-	Timeout int // ms
+	NasIpAddress  uint32
+	NasPort       uint32
+	NasPortType   uint32
+	ServiceType   uint32
+	Server        string
+	AuthPort      string
+	AcctPort      string
+	Timeout       int // ms
 }
 
 var param = &Param{
-	Secret:[]byte("testing123"),
-	NasIdentifier:[]byte("ums.autelan.com"),
-	NasPort:0,
-	NasPortType:uint32(AnptIeee80211),
-	ServiceType:uint32(AstLogin),
-	Server:"116.228.184.202",
-	AuthPort:"1812",
-	AcctPort:"1813",
-	Timeout:3000,
+	Secret:        []byte("testing123"),
+	NasIdentifier: []byte("ums.autelan.com"),
+	NasPort:       0,
+	NasPortType:   uint32(AnptIeee80211),
+	ServiceType:   uint32(AstLogin),
+	Server:        "116.228.184.202",
+	AuthPort:      "1812",
+	AcctPort:      "1813",
+	Timeout:       3000,
 }
 
 type User struct {
 	ssid []byte
-	dev [6]byte
-	
-	passwd []byte
+	dev  [6]byte
+
+	passwd    []byte
 	sessionid [AcctSessionIdLength]byte
-	name []byte
-	mac [6]byte // binary mac
-	ip uint32
-	input uint32
-	output uint32
-	inputg uint32
-	outputg uint32
-	reason uint32
-	
+	name      []byte
+	mac       [6]byte // binary mac
+	ip        uint32
+	input     uint32
+	output    uint32
+	inputg    uint32
+	outputg   uint32
+	reason    uint32
+
 	class []byte
 }
 
 var user = &User{
-	ssid:[]byte("i-shanghai"),
-	
-	name:[]byte("10000000000@windfind.static@ish"),
-	passwd:[]byte("123456"),
-	input:1000*1000,
-	output:1000*2000,
-	inputg:0,
-	outputg:0,
-	reason:uint32(AtcUserRequest),
+	ssid: []byte("i-shanghai"),
+
+	name:    []byte("10000000000@windfind.static@ish"),
+	passwd:  []byte("123456"),
+	input:   1000 * 1000,
+	output:  1000 * 2000,
+	inputg:  0,
+	outputg: 0,
+	reason:  uint32(AtcUserRequest),
 }
 
 func testInit(t *testing.T) {
 	SetLogger(&mlog)
-	
+
 	//param init
 	param.NasIpAddress = uint32(IpAddressFromString("120.26.47.127"))
+	t.Logf("test init param:%#v" + Crlf, param)
 	
 	//user init
 	Mac(user.mac[:]).FromString("F8:95:C7:D9:37:74")
 	Mac(user.dev[:]).FromString("00:1f:64:00:00:01")
 	user.ip = uint32(IpAddressFromString("192.168.100.200"))
-	
 	ClientSessionId(user.mac[:], user.sessionid[:])
+	t.Logf("test init user:%#v" + Crlf, user)
 }
 
 func (me *User) SSID() []byte {
@@ -155,7 +156,7 @@ func (me *User) ServiceType() uint32 {
 	return param.ServiceType
 }
 
-func (me *User) Server () string {
+func (me *User) Server() string {
 	return param.Server
 }
 
@@ -176,75 +177,80 @@ type plog struct{}
 var mlog plog
 
 func (me *plog) Emerg(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Alert(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Crit(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Error(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Warning(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Notice(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Info(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
 func (me *plog) Debug(format string, v ...interface{}) {
-	fmt.Printf(format + Crlf, v...)
+	fmt.Printf(format+Crlf, v...)
 }
 
-func testAuth(t *testing.T){
+func testAuth(t *testing.T) {
 	t.Log("testing auth start ...")
-	fmt.Println("param", param)
-	fmt.Println("user", user)
-	
+
 	policy, err := ClientAuth(user)
-	if nil!=err {
-		t.Fatal("test auth error", err)
+	if nil != err {
+		t.Fatal("test auth error:", err)
 	}
-	fmt.Println("policy", policy)
+	t.Logf("test auth get policy:%#v" + Crlf, policy)
+	
 	t.Log("test auth PASS")
 }
 
-func testAcctStart(t *testing.T){
+func testAcctStart(t *testing.T) {
 	t.Log("testing acct start ...")
-	if _, err := ClientAcctStart(user); nil!=err {
+	
+	if _, err := ClientAcctStart(user); nil != err {
 		t.Fatal("test acct start error:", err)
 	}
+	
 	t.Log("test acct start PASS")
 }
 
-func testAcctUpdate(t *testing.T){
+func testAcctUpdate(t *testing.T) {
 	t.Log("testing acct update ...")
-	if _, err := ClientAcctUpdate(user); nil!=err {
+	
+	if _, err := ClientAcctUpdate(user); nil != err {
 		t.Fatal("test acct update error:", err)
 	}
+	
 	t.Log("test acct update PASS")
 }
 
-func testAcctStop(t *testing.T){
+func testAcctStop(t *testing.T) {
 	t.Log("testing acct stop ...")
-	if _, err := ClientAcctStop(user); nil!=err {
+	
+	if _, err := ClientAcctStop(user); nil != err {
 		t.Fatal("test acct stop error:", err)
 	}
-	t.Log("test acct stop PASS")	
+	
+	t.Log("test acct stop PASS")
 }
 
-func TestClient(t *testing.T){
+func TestClient(t *testing.T) {
 	testInit(t)
 	testAuth(t)
 	testAcctStart(t)

@@ -23,8 +23,8 @@ func (me EAtaValue) Int() int {
 }
 
 func (me EAtaValue) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(ataBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(ataBind) == me.End() &&
 		len(ataBind[me]) > 0
 }
 
@@ -37,7 +37,7 @@ func (me EAtaValue) ToString() string {
 func (me *EAtaValue) FromString(Name string) error {
 	if e, ok := ataMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -45,23 +45,23 @@ func (me *EAtaValue) FromString(Name string) error {
 }
 
 const (
-	ataBegin			EAtaValue = 0
-	
-	AtaDefault 			EAtaValue = 0
-	AtaRadiusRequest	EAtaValue = 1
+	ataBegin EAtaValue = 0
 
-	ataEnd 				EAtaValue = 2
+	AtaDefault       EAtaValue = 0
+	AtaRadiusRequest EAtaValue = 1
+
+	ataEnd EAtaValue = 2
 )
 
 var ataBind = [ataEnd]string{
-	AtaDefault:			"Default",
-	AtaRadiusRequest:	"RADIUS-Request",
+	AtaDefault:       "Default",
+	AtaRadiusRequest: "RADIUS-Request",
 }
 
 var ataMap = map[string]EAtaValue{}
 
 func initAta() {
-	for i:=ataBegin; i<ataEnd; i++ {
+	for i := ataBegin; i < ataEnd; i++ {
 		ataMap[ataBind[i]] = i
 	}
 }

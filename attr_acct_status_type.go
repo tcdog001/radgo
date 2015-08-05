@@ -25,14 +25,14 @@ func (me EAastValue) Int() int {
 func (me EAastValue) IsGood() bool {
 	if !IsGoodEnum(me) {
 		log.Error("bad attr(%s) value(%d)", me.Tag(), me)
-		
+
 		return false
-	} else if 0==len(aastBind[me]) {
+	} else if 0 == len(aastBind[me]) {
 		log.Error("no support attr(%s) value(%d)", me.Tag(), me)
-		
+
 		return false
 	}
-	
+
 	return true
 }
 
@@ -45,7 +45,7 @@ func (me EAastValue) ToString() string {
 func (me *EAastValue) FromString(Name string) error {
 	if e, ok := aastMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -53,31 +53,31 @@ func (me *EAastValue) FromString(Name string) error {
 }
 
 const (
-	aastBegin			EAastValue = 1
-	
-	AastStart 			EAastValue = 1
-	AastStop			EAastValue = 2
-	AastInterimUpdate	EAastValue = 3
-	AastAccountingOn	EAastValue = 4
-	AastAccountingOff	EAastValue = 5
-	AastFailed 			EAastValue = 15
+	aastBegin EAastValue = 1
 
-	aastEnd 			EAastValue = 16
+	AastStart         EAastValue = 1
+	AastStop          EAastValue = 2
+	AastInterimUpdate EAastValue = 3
+	AastAccountingOn  EAastValue = 4
+	AastAccountingOff EAastValue = 5
+	AastFailed        EAastValue = 15
+
+	aastEnd EAastValue = 16
 )
 
 var aastBind = [aastEnd]string{
-	AastStart:			"Start",
-	AastStop:			"Stop",
-	AastInterimUpdate:	"Interim-Update",
-	AastAccountingOn:	"Accounting-On",
-	AastAccountingOff:	"Accounting-Off",
-	AastFailed:			"Failed",
+	AastStart:         "Start",
+	AastStop:          "Stop",
+	AastInterimUpdate: "Interim-Update",
+	AastAccountingOn:  "Accounting-On",
+	AastAccountingOff: "Accounting-Off",
+	AastFailed:        "Failed",
 }
 
 var aastMap = map[string]EAastValue{}
 
 func initAast() {
-	for i:=aastBegin; i<aastEnd; i++ {
+	for i := aastBegin; i < aastEnd; i++ {
 		aastMap[aastBind[i]] = i
 	}
 }

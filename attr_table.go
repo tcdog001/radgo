@@ -23,8 +23,8 @@ func (me EAttrTableValue) Int() int {
 }
 
 func (me EAttrTableValue) IsGood() bool {
-	return IsGoodEnum(me) && 
-		len(attrTableBind)==me.End() && 
+	return IsGoodEnum(me) &&
+		len(attrTableBind) == me.End() &&
 		len(attrTableBind[me]) > 0
 }
 
@@ -37,7 +37,7 @@ func (me EAttrTableValue) ToString() string {
 func (me *EAttrTableValue) FromString(Name string) error {
 	if e, ok := attrTableMap[Name]; ok {
 		*me = e
-		
+
 		return nil
 	}
 
@@ -49,27 +49,27 @@ func (me *EAttrTableValue) FromString(Name string) error {
 // 0-1   Zero or one instance of this attribute MAY be present in packet.
 // 1     Exactly one instance of this attribute MUST be present in packet.
 const (
-	attrTableBegin 		EAttrTableValue = 0
-	
-	AttrTableZero		EAttrTableValue = 0
-	AttrTableZeroMore	EAttrTableValue = 1
-	AttrTableZeroOne	EAttrTableValue = 2
-	AttrTableOne		EAttrTableValue = 3
+	attrTableBegin EAttrTableValue = 0
 
-	attrTableEnd		EAttrTableValue = 4
+	AttrTableZero     EAttrTableValue = 0
+	AttrTableZeroMore EAttrTableValue = 1
+	AttrTableZeroOne  EAttrTableValue = 2
+	AttrTableOne      EAttrTableValue = 3
+
+	attrTableEnd EAttrTableValue = 4
 )
 
 var attrTableBind = [attrTableEnd]string{
-	AttrTableZero:		"Zero",
-	AttrTableZeroMore:	"ZeroOrMore",
-	AttrTableZeroOne:	"ZeroOrOne",
-	AttrTableOne:		"One",
+	AttrTableZero:     "Zero",
+	AttrTableZeroMore: "ZeroOrMore",
+	AttrTableZeroOne:  "ZeroOrOne",
+	AttrTableOne:      "One",
 }
 
 var attrTableMap = map[string]EAttrTableValue{}
 
 func initAttrTable() {
-	for i:=attrTableBegin; i<attrTableEnd; i++ {
+	for i := attrTableBegin; i < attrTableEnd; i++ {
 		attrTableMap[attrTableBind[i]] = i
 	}
 }

@@ -1,6 +1,6 @@
 package radgo
 
-func init(){
+func init() {
 	initDebug()
 	initPktCode()
 	initAttrType()
