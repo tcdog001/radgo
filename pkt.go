@@ -85,8 +85,8 @@ func (me *Header) FromBinary(bin []byte) error {
 		return ErrTooShortBuffer
 	}
 	
-	code := EPktCode(bin[0])
-	if !code.IsGood() {
+	Code := EPktCode(bin[0])
+	if !Code.IsGood() {
 		return Error
 	}
 	
@@ -99,7 +99,7 @@ func (me *Header) FromBinary(bin []byte) error {
 		return ErrPktLenNoMatchBufferLen
 	}
 	
-	me.Code = code
+	me.Code = Code
 	me.Id 	= bin[1]
 	me.Len 	= Len
 	copy(me.Auth[:], bin[4:4+AuthSize])
