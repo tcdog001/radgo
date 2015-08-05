@@ -34,6 +34,16 @@ func (me EPktCode) ToString() string {
 	return b.EntryShow(me)
 }
 
+func (me *EPktCode) FromString(Name string) error {
+	if e, ok := pktCodeMap[Name]; ok {
+		*me = e
+		
+		return nil
+	}
+
+	return ErrNoFound
+}
+
 func (me EPktCode) Match(Type EAttrType) EAttrTableValue {
 	if me.IsGood() && Type.IsGood() {
 		return attrTypeBind[Type].table[me]
@@ -85,6 +95,8 @@ var pktCodeBind = [PktCodeEnd]string{
 	AccountingResponse:	"Accounting-Response",
 }
 
+var pktCodeMap = map[string]EPktCode{}
+
 var codeDirBind = [PktCodeEnd]ENetworkDir{
 	AccessRequest:		ToServer,
 	AccessAccept:		ToClient,
@@ -94,3 +106,8 @@ var codeDirBind = [PktCodeEnd]ENetworkDir{
 	AccountingResponse:	ToClient,
 }
 
+func initPktCode() {
+	for i:=PktCodeBegin; i<PktCodeEnd; i++ {
+		pktCodeMap[pktCodeBind[i]] = i
+	}
+}

@@ -489,7 +489,7 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 	},
 }
 
-func initAttrType(){	
+func initAttrType() {
 	for idx := AttrTypeBegin; idx<AttrTypeEnd; idx++ {
 		v := attrTypeBind[idx]
 		if nil==v {
