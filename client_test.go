@@ -53,7 +53,7 @@ var user = &User{
 	ssid: []byte("i-shanghai"),
 
 	name:    []byte("10000000000@windfind.static@ish"),
-	passwd:  []byte("1234567"),
+	passwd:  []byte("123456"),
 	input:   1000 * 1000,
 	output:  1000 * 2000,
 	inputg:  0,
@@ -211,9 +211,9 @@ func (me *plog) Debug(format string, v ...interface{}) {
 func testAuth(t *testing.T) {
 	t.Log("testing auth start ...")
 
-	policy, err := ClientAuth(user)
-	if nil != err {
-		t.Fatal("test auth error:", err)
+	policy, err, authError := ClientAuth(user)
+	if nil != err || nil != authError {
+		t.Fatal("test auth error:", err, authError)
 	}
 	t.Logf("test auth get policy:%#v" + Crlf, policy)
 	
@@ -223,8 +223,8 @@ func testAuth(t *testing.T) {
 func testAcctStart(t *testing.T) {
 	t.Log("testing acct start ...")
 	
-	if _, err := ClientAcctStart(user); nil != err {
-		t.Fatal("test acct start error:", err)
+	if err, acctError := ClientAcctStart(user); nil != err || nil != acctError {
+		t.Fatal("test acct start error:", err, acctError)
 	}
 	
 	t.Log("test acct start PASS")
@@ -233,8 +233,8 @@ func testAcctStart(t *testing.T) {
 func testAcctUpdate(t *testing.T) {
 	t.Log("testing acct update ...")
 	
-	if _, err := ClientAcctUpdate(user); nil != err {
-		t.Fatal("test acct update error:", err)
+	if err, acctError := ClientAcctUpdate(user); nil != err || nil != acctError {
+		t.Fatal("test acct update error:", err, acctError)
 	}
 	
 	t.Log("test acct update PASS")
@@ -243,8 +243,8 @@ func testAcctUpdate(t *testing.T) {
 func testAcctStop(t *testing.T) {
 	t.Log("testing acct stop ...")
 	
-	if _, err := ClientAcctStop(user); nil != err {
-		t.Fatal("test acct stop error:", err)
+	if err, acctError := ClientAcctStop(user); nil != err || nil != acctError {
+		t.Fatal("test acct stop error:", err, acctError)
 	}
 	
 	t.Log("test acct stop PASS")
