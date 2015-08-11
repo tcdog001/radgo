@@ -4,6 +4,7 @@ import (
 	. "asdf"
 	"net"
 	"time"
+	"errors"
 )
 
 type IAuth interface {
@@ -295,84 +296,108 @@ func (me *client) net() error {
 	return nil
 }
 
-func (me *client) auth(r IAuth) (*Policy, error) {
+type AuthError error
+
+func (me *client) auth(r IAuth) (*Policy, error, AuthError) {
 	err := error(nil)
 
 	me.remote, err = net.ResolveUDPAddr("udp4", r.Server()+":"+r.AuthPort())
 	if nil != err {
-		return nil, me.debugError(err)
+		return nil, me.debugError(err), nil
 	}
 
 	if err := me.initConn(r); nil != err {
-		return nil, me.debugError(err)
+		return nil, me.debugError(err), nil
 	}
 
 	if err := me.initAuth(r); nil != err {
-		return nil, me.debugError(err)
+		return nil, me.debugError(err), nil
 	}
 
 	q := &me.request
 	if err := q.ToBinary(me.bin[:]); nil != err {
-		return nil, me.debugError(err)
+		return nil, me.debugError(err), nil
 	}
 
 	if err := me.net(); nil != err {
-		return nil, me.debugError(err)
+		return nil, me.debugError(err), nil
 	}
 
 	p := &me.response
 	if err := p.FromBinary(me.bin[:me.rlen]); nil != err {
-		return nil, me.debugError(err)
+		return nil, me.debugError(err), nil
 	}
 
 	if AccessAccept != p.Code {
-		return nil, me.debugError(Error)
+		return nil, me.debugError(Error), nil
+	}
+	
+	if authError := p.Attrs[ReplyMessage].GetString(); nil != authError {
+		err := errors.New(string(authError))
+		if IsGoodReplyMessage(authError) {
+			return nil, nil, err
+		} else {
+			return nil, ErrUnknowReplyMessage, err
+		}
+	}
+	
+	if authClass := p.Attrs[Class].GetString(); nil!=authClass {
+		r.SetClass(authClass)
 	}
 
-	r.SetClass(p.Attrs[Class].GetString())
-
-	return p.Policy(), nil
+	return p.Policy(), nil, nil
 }
 
-func (me *client) acct(r IAcct, action EAastValue) (bool, error) {
+type AcctError error
+
+func (me *client) acct(r IAcct, action EAastValue) (error, AcctError) {
 	err := error(nil)
 
 	me.remote, err = net.ResolveUDPAddr("udp4", r.Server()+":"+r.AcctPort())
 	if nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	if err := me.initConn(r); nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	if err := me.initAcct(r, action); nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	q := &me.request
 	if err := q.ToBinary(me.bin[:]); nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	if err := PktAuth(me.bin[4:PktHdrSize]).AcctRequest(me.bin[:me.request.Len], r.Secret()); nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	if err := me.net(); nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	p := &me.response
 	if err := p.FromBinary(me.bin[:me.rlen]); nil != err {
-		return false, me.debugError(err)
+		return me.debugError(err), nil
 	}
 
 	if AccountingResponse != p.Code {
-		return false, me.debugError(Error)
+		return me.debugError(Error), nil
+	}
+	
+	if acctError := p.Attrs[ReplyMessage].GetString(); nil != acctError {
+		err := errors.New(string(acctError))
+		if IsGoodReplyMessage(acctError) {
+			return nil, err
+		} else {
+			return ErrUnknowReplyMessage, err
+		}
 	}
 
-	return true, nil
+	return nil, nil
 }
 
 func ClientSessionId(mac Mac /* in */, session []byte /* out */) error {
@@ -382,28 +407,28 @@ func ClientSessionId(mac Mac /* in */, session []byte /* out */) error {
 	return s.ToBinary(session)
 }
 
-func ClientAuth(r IAuth) (*Policy, error) {
+func ClientAuth(r IAuth) (*Policy, error, AuthError) {
 	c := newClient(r.UserMac())
 	defer func() { c = nil }()
 
 	return c.auth(r)
 }
 
-func ClientAcctStart(r IAcct) (bool, error) {
+func ClientAcctStart(r IAcct) (error, AcctError) {
 	c := newClient(r.UserMac())
 	defer func() { c = nil }()
 
 	return c.acct(r, AastStart)
 }
 
-func ClientAcctUpdate(r IAcct) (bool, error) {
+func ClientAcctUpdate(r IAcct) (error, AcctError) {
 	c := newClient(r.UserMac())
 	defer func() { c = nil }()
 
 	return c.acct(r, AastInterimUpdate)
 }
 
-func ClientAcctStop(r IAcct) (bool, error) {
+func ClientAcctStop(r IAcct) (error, AcctError) {
 	c := newClient(r.UserMac())
 	defer func() { c = nil }()
 

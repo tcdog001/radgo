@@ -53,7 +53,7 @@ var user = &User{
 	ssid: []byte("i-shanghai"),
 
 	name:    []byte("10000000000@windfind.static@ish"),
-	passwd:  []byte("123456"),
+	passwd:  []byte("1234567"),
 	input:   1000 * 1000,
 	output:  1000 * 2000,
 	inputg:  0,
