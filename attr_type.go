@@ -500,8 +500,7 @@ func initAttrType() {
 		attrTypeMap[v.name] = v
 
 		switch v.avt {
-		case AvtText:
-			fallthrough
+		case AvtText:fallthrough
 		case AvtString:
 			if 0 == v.min {
 				v.min = 1
@@ -509,10 +508,8 @@ func initAttrType() {
 			if 0 == v.max {
 				v.max = AttrLengthMax - 2
 			}
-		case AvtInteger:
-			fallthrough
-		case AvtAddress:
-			fallthrough
+		case AvtInteger:fallthrough
+		case AvtAddress:fallthrough
 		case AvtTime:
 			if 0 == v.min {
 				v.min = 4
