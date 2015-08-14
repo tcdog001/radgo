@@ -24,11 +24,11 @@ func (me EAnptValue) Int() int {
 
 func (me EAnptValue) IsGood() bool {
 	if !IsGoodEnum(me) {
-		log.Error("bad attr(%s) value(%d)", me.Tag(), me)
+		Log.Error("bad attr(%s) value(%d)", me.Tag(), me)
 
 		return false
 	} else if 0 == len(anptBind[me]) {
-		log.Error("no support attr(%s) value(%d)", me.Tag(), me)
+		Log.Error("no support attr(%s) value(%d)", me.Tag(), me)
 
 		return false
 	}

@@ -1,6 +1,7 @@
 package radgo
 
 import (
+	. "asdf"
 	. "strconv"
 )
 
@@ -14,7 +15,7 @@ func (me AttrClass) UpRateMax() uint32 {
 		return uint32(v)
 	}
 
-	log.Error("bad attr class UpRateMax(%s)", s)
+	Log.Error("bad attr class UpRateMax(%s)", s)
 
 	return 0
 }
@@ -26,7 +27,7 @@ func (me AttrClass) UpRateAvg() uint32 {
 		return uint32(v)
 	}
 
-	log.Error("bad attr class UpRateAvg(%s)", s)
+	Log.Error("bad attr class UpRateAvg(%s)", s)
 
 	return 0
 }
@@ -38,7 +39,7 @@ func (me AttrClass) DownRateMax() uint32 {
 		return uint32(v)
 	}
 
-	log.Error("bad attr class DownRateMax(%s)", s)
+	Log.Error("bad attr class DownRateMax(%s)", s)
 
 	return 0
 }
@@ -50,7 +51,7 @@ func (me AttrClass) DownRateAvg() uint32 {
 		return uint32(v)
 	}
 
-	log.Error("bad attr class DownRateAvg(%s)", s)
+	Log.Error("bad attr class DownRateAvg(%s)", s)
 
 	return 0
 }

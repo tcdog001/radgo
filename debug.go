@@ -71,7 +71,7 @@ func debugUser(mac Mac, format string, v ...interface{}) {
 		user := [6]byte{mac[0], mac[1], mac[2], mac[3], mac[4], mac[5]}
 
 		if d, ok := debugControl.Users[user]; d && ok {
-			log.Debug(format, v)
+			Log.Debug(format, v)
 		}
 	}
 }

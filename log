@@ -4,8 +4,8 @@ import (
 	. "asdf"
 )
 
-var log ILogger
+var Log ILogger
 
 func SetLogger(r ILogger) {
-	log = r
+	Log = r
 }

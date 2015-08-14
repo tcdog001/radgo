@@ -88,7 +88,7 @@ func (me *Attr) SetString(Value []byte) error {
 
 	// check value type
 	if !Type.ValueType().IsString() {
-		log.Error("attr %s value is not string", Type.ToString())
+		Log.Error("attr %s value is not string", Type.ToString())
 		return Error
 	}
 
@@ -101,7 +101,7 @@ func (me *Attr) SetString(Value []byte) error {
 	me.Len = Len
 	copy(me.GetString(), Value)
 
-	log.Info("set attr(%s) Len(%d) String(%s)",
+	Log.Info("set attr(%s) Len(%d) String(%s)",
 		Type.ToString(),
 		Len,
 		me.GetString())
@@ -127,7 +127,7 @@ func (me *Attr) SetNumber(Value uint32) error {
 	me.Len = 6
 	me.Number = Value
 
-	log.Info("set attr(%s) Number(%d)",
+	Log.Info("set attr(%s) Number(%d)",
 		me.Type.ToString(),
 		me.Number)
 
@@ -155,7 +155,7 @@ func (me *Attr) ToBinary(bin []byte) error {
 	}
 
 	if me.Len > Len {
-		log.Error("attr(%s) Len(%d) < bin Len(%d)",
+		Log.Error("attr(%s) Len(%d) < bin Len(%d)",
 			me.Type.ToString(),
 			me.Len,
 			Len)
@@ -168,13 +168,13 @@ func (me *Attr) ToBinary(bin []byte) error {
 	if me.Type.ValueType().IsNumber() {
 		ab.SetNumber(me.Type, me.Number)
 
-		log.Info("write attr(%s) Number(%d)",
+		Log.Info("write attr(%s) Number(%d)",
 			me.Type.ToString(),
 			me.Number)
 	} else {
 		ab.SetString(me.Type, me.GetString())
 
-		log.Info("write attr(%s) Len(%d) String(%s)",
+		Log.Info("write attr(%s) Len(%d) String(%s)",
 			me.Type.ToString(),
 			me.Len,
 			me.GetString())
@@ -203,7 +203,7 @@ func (me *Attr) FromBinary(bin []byte) error {
 	}
 
 	if Len > byte(len(bin)) {
-		log.Error("bin attr(%s) Len(%d) < bin Len(%d)",
+		Log.Error("bin attr(%s) Len(%d) < bin Len(%d)",
 			Type.ToString(),
 			Len,
 			len(bin))
@@ -220,14 +220,14 @@ func (me *Attr) FromBinary(bin []byte) error {
 			return Error
 		}
 
-		log.Info("read attr(%s) Len(%d) Number(%d)",
+		Log.Info("read attr(%s) Len(%d) Number(%d)",
 			me.Type.ToString(),
 			me.Len,
 			me.Number)
 	} else {
 		copy(me.GetString(), ab.Value())
 
-		log.Info("read attr(%s) Len(%d) String(%s)",
+		Log.Info("read attr(%s) Len(%d) String(%s)",
 			me.Type.ToString(),
 			me.Len,
 			me.GetString())

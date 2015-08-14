@@ -62,8 +62,6 @@ var user = &User{
 }
 
 func testInit(t *testing.T) {
-	SetLogger(&mlog)
-
 	//param init
 	param.NasIpAddress = uint32(IpAddressFromString("120.26.47.127"))
 	t.Logf("test init param:%#v" + Crlf, param)
@@ -170,42 +168,6 @@ func (me *User) AcctPort() string {
 
 func (me *User) Timeout() int {
 	return param.Timeout
-}
-
-type plog struct{}
-
-var mlog plog
-
-func (me *plog) Emerg(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Alert(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Crit(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Error(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Warning(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Notice(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Info(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
-}
-
-func (me *plog) Debug(format string, v ...interface{}) {
-	fmt.Printf(format+Crlf, v...)
 }
 
 func testAuth(t *testing.T) {

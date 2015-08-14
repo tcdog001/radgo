@@ -1,6 +1,7 @@
 package radgo
 
 import (
+	. "asdf"
 	"crypto/md5"
 )
 
@@ -19,7 +20,7 @@ func (me AttrUserPassword) isAlign() bool {
 func (me AttrUserPassword) Block(idx int) []byte {
 	count := me.Count()
 	if idx < 0 || idx >= count {
-		log.Error("bad user password block index(%d), should [%d, %d)",
+		Log.Error("bad user password block index(%d), should [%d, %d)",
 			idx, 0, count)
 
 		return nil

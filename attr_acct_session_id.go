@@ -32,7 +32,7 @@ func (me *SessionId) checkLengh(bin []byte) error {
 	Len := len(bin)
 
 	if Len < AcctSessionIdLength {
-		log.Error("SessionId bin length is %d, must >= %d",
+		Log.Error("SessionId bin length is %d, must >= %d",
 			Len,
 			AcctSessionIdLength)
 

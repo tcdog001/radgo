@@ -24,11 +24,11 @@ func (me EAtcValue) Int() int {
 
 func (me EAtcValue) IsGood() bool {
 	if !IsGoodEnum(me) {
-		log.Error("bad attr(%s) value(%d)", me.Tag(), me)
+		Log.Error("bad attr(%s) value(%d)", me.Tag(), me)
 
 		return false
 	} else if 0 == len(atcBind[me]) {
-		log.Error("no support attr(%s) value(%d)", me.Tag(), me)
+		Log.Error("no support attr(%s) value(%d)", me.Tag(), me)
 
 		return false
 	}
@@ -127,11 +127,11 @@ func (me DeauthReason) Int() int {
 
 func (me DeauthReason) IsGood() bool {
 	if !IsGoodEnum(me) {
-		log.Error("bad %s(%d)", me.Tag(), me)
+		Log.Error("bad %s(%d)", me.Tag(), me)
 
 		return false
 	} else if 0 == len(drBind[me]) {
-		log.Error("no support %s(%d)", me.Tag(), me)
+		Log.Error("no support %s(%d)", me.Tag(), me)
 
 		return false
 	}

@@ -54,7 +54,7 @@ func (me EPktCode) Match(Type EAttrType) EAttrTableValue {
 
 func (me EPktCode) IsMatch(Type EAttrType) bool {
 	if AttrTableZero == me.Match(Type) {
-		log.Info("code %s and type %s should match, but is %s",
+		Log.Info("code %s and type %s should match, but is %s",
 			me.ToString(),
 			Type.ToString(),
 			AttrTableZero.ToString())
