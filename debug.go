@@ -33,7 +33,7 @@ func (me *DebugConfig) Load() {
 
 	json.Unmarshal(b.Bytes(), me)
 
-	fmt.Printf("load debuf file(%s):%+v" + Crlf, fileDebug, me)
+	fmt.Printf("load debug file(%s):%+v" + Crlf, fileDebug, me)
 }
 
 type DebugControl struct {

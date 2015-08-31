@@ -53,28 +53,28 @@ func (me *EAtcValue) FromString(Name string) error {
 }
 
 const (
-	atcBegin EAtcValue = 1
+	atcBegin 				EAtcValue = 1
 
-	AtcUserRequest        EAtcValue = 1
-	AtcLostCarrier        EAtcValue = 2
-	AtcLostService        EAtcValue = 3
-	AtcIdleTimeout        EAtcValue = 4
-	AtcSessionTimeout     EAtcValue = 5
-	AtcAdminReset         EAtcValue = 6
-	AtcAdminReboot        EAtcValue = 7
-	AtcPortError          EAtcValue = 8
-	AtcNasError           EAtcValue = 9
-	AtcNasRequest         EAtcValue = 10
-	AtcNasReboot          EAtcValue = 11
-	AtcPortUnneeded       EAtcValue = 12
-	AtcPortPreempted      EAtcValue = 13
-	AtcPortSuspended      EAtcValue = 14
-	AtcServiceUnavailable EAtcValue = 15
-	AtcCallback           EAtcValue = 16
-	AtcUserError          EAtcValue = 17
-	AtcHostRequest        EAtcValue = 18
+	AtcUserRequest        	EAtcValue = 1
+	AtcLostCarrier        	EAtcValue = 2
+	AtcLostService        	EAtcValue = 3
+	AtcIdleTimeout        	EAtcValue = 4
+	AtcSessionTimeout     	EAtcValue = 5
+	AtcAdminReset         	EAtcValue = 6
+	AtcAdminReboot        	EAtcValue = 7
+	AtcPortError          	EAtcValue = 8
+	AtcNasError           	EAtcValue = 9
+	AtcNasRequest         	EAtcValue = 10
+	AtcNasReboot          	EAtcValue = 11
+	AtcPortUnneeded       	EAtcValue = 12
+	AtcPortPreempted      	EAtcValue = 13
+	AtcPortSuspended      	EAtcValue = 14
+	AtcServiceUnavailable 	EAtcValue = 15
+	AtcCallback           	EAtcValue = 16
+	AtcUserError          	EAtcValue = 17
+	AtcHostRequest        	EAtcValue = 18
 
-	atcEnd EAtcValue = 19
+	atcEnd 					EAtcValue = 19
 )
 
 var atcBind = [atcEnd]string{
@@ -184,8 +184,8 @@ var drBind = [DeauthReasonEnd]string{
 }
 
 var ressonToCause = [DeauthReasonEnd]EAtcValue{
-	DeauthReasonNone:       AtcUserError,
-	DeauthReasonAuto:       AtcUserError,
+	DeauthReasonNone:       AtcNasError,
+	DeauthReasonAuto:       AtcHostRequest,
 	DeauthReasonOnlineTime: AtcSessionTimeout,
 	DeauthReasonFlowLimit:  AtcLostService, // need define new cause ???
 	DeauthReasonAdmin:      AtcAdminReset,

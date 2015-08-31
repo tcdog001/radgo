@@ -2,7 +2,7 @@ package radgo
 
 import (
 	. "asdf"
-	"fmt"
+//	"fmt"
 	"testing"
 )
 
