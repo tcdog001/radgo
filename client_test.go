@@ -16,7 +16,7 @@ type Param struct {
 	Server        string
 	AuthPort      string
 	AcctPort      string
-	Timeout       int // ms
+	Timeout       uint32 // ms
 }
 
 var param = &Param{
@@ -166,7 +166,7 @@ func (me *User) AcctPort() string {
 	return param.AcctPort
 }
 
-func (me *User) Timeout() int {
+func (me *User) Timeout() uint32 {
 	return param.Timeout
 }
 

@@ -45,7 +45,7 @@ type IParam interface {
 	Server() string
 	AuthPort() string
 	AcctPort() string
-	Timeout() int // ms
+	Timeout() uint32 // ms
 }
 
 type Policy struct {
