@@ -36,7 +36,7 @@ type User struct {
 	dev  [6]byte
 
 	passwd    []byte
-	sessionid [AcctSessionIdLength]byte
+	sessionid string
 	name      []byte
 	mac       [6]byte // binary mac
 	ip        uint32
@@ -70,7 +70,7 @@ func testInit(t *testing.T) {
 	Mac(user.mac[:]).FromString("F8:95:C7:D9:37:74")
 	Mac(user.dev[:]).FromString("00:1f:64:00:00:01")
 	user.ip = uint32(IpAddressFromString("192.168.100.200"))
-	ClientSessionId(user.mac[:], user.dev[:], user.sessionid[:])
+	user.sessionid = NewSessionId(user.mac[:], user.dev[:])
 	t.Logf("test init user:%#v" + Crlf, user)
 }
 
@@ -87,7 +87,7 @@ func (me *User) UserPassword() []byte {
 }
 
 func (me *User) SessionId() []byte {
-	return me.sessionid[:]
+	return []byte(me.sessionid)
 }
 
 func (me *User) UserName() []byte {

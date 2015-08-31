@@ -400,10 +400,6 @@ func (me *client) acct(r IAcct, action EAastValue) (error, AcctError) {
 	return nil, nil
 }
 
-func ClientSessionId(user, dev Mac /* in */, session []byte /* out */) {
-	copy(session, newSessionId(user, dev))
-}
-
 func ClientAuth(r IAuth) (*Policy, error, AuthError) {
 	c := newClient(r.UserMac())
 	defer func() { c = nil }()

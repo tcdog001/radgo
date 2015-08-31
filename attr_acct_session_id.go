@@ -5,9 +5,11 @@ import (
 	"time"
 )
 
-const AcctSessionIdLength = 32
+const AcctSessionIdLength = 12*2+14
 
-func newSessionId(user Mac, dev Mac) string {
-	return user.ToStringS() + dev.ToStringS() + time.Now().Format("20060102150405")
+func NewSessionId(user Mac, dev Mac) string {
+	return 	user.ToStringS() + 
+			dev.ToStringS() + 
+			time.Now().Format("20060102150405")
 }
 
