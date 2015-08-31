@@ -400,11 +400,8 @@ func (me *client) acct(r IAcct, action EAastValue) (error, AcctError) {
 	return nil, nil
 }
 
-func ClientSessionId(mac Mac /* in */, session []byte /* out */) error {
-	s := &SessionId{}
-	s.Init(mac)
-
-	return s.ToBinary(session)
+func ClientSessionId(user, dev Mac /* in */, session []byte /* out */) {
+	copy(session, newSessionId(user, dev))
 }
 
 func ClientAuth(r IAuth) (*Policy, error, AuthError) {

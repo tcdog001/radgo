@@ -70,7 +70,7 @@ func testInit(t *testing.T) {
 	Mac(user.mac[:]).FromString("F8:95:C7:D9:37:74")
 	Mac(user.dev[:]).FromString("00:1f:64:00:00:01")
 	user.ip = uint32(IpAddressFromString("192.168.100.200"))
-	ClientSessionId(user.mac[:], user.sessionid[:])
+	ClientSessionId(user.mac[:], user.dev[:], user.sessionid[:])
 	t.Logf("test init user:%#v" + Crlf, user)
 }
 
