@@ -54,6 +54,7 @@ type IParam interface {
 	AuthType() uint32 // 0:pap, 1:chap
 	AuthPort() string
 	AcctPort() string
+	DmPort() string
 	Timeout() uint32 // ms
 }
 
@@ -470,4 +471,28 @@ func ClientAcctStop(r IAcct) (error, AcctError) {
 	defer func() { c = nil }()
 
 	return c.acct(r, AastStop)
+}
+
+//----------------- DM ------------------
+type DmDeft struct{}
+
+func (me *DmDeft) DM(mac Mac) error {
+	Log.Info("DM %s" + Crlf, mac.ToString())
+	
+	return nil
+}
+
+type IDm interface {
+	DM(mac Mac) error
+}
+
+var dM IDm = &DmDeft{}
+
+func SetDM(dm IDm) {
+	dM = dm
+}
+
+// go it
+func radRun() {
+	
 }

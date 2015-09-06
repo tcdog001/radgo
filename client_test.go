@@ -16,6 +16,7 @@ type Param struct {
 	AuthType 	  	uint32 // 0:pap, 1:chap
 	AuthPort      	string
 	AcctPort      	string
+	DmPort 			string
 	Timeout       	uint32 // ms
 }
 
@@ -29,6 +30,7 @@ var param = &Param{
 	AuthType:		1,
 	AuthPort:      	"1812",
 	AcctPort:      	"1813",
+	DmPort:			"3799",
 	Timeout:       	3000,
 }
 
@@ -169,6 +171,10 @@ func (me *User) AuthPort() string {
 
 func (me *User) AcctPort() string {
 	return param.AcctPort
+}
+
+func (me *User) DmPort() string {
+	return param.DmPort
 }
 
 func (me *User) Timeout() uint32 {

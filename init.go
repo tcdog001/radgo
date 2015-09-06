@@ -20,4 +20,5 @@ func init() {
 	initAast()
 	initAnpt()
 	
+	radRun()
 }
