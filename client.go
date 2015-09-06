@@ -7,6 +7,16 @@ import (
 	"errors"
 )
 
+const (
+	RadPrivateBegin 		RadPrivate = 0
+	
+	RadPrivateClass 		RadPrivate = 0
+	RadPrivateChapChallenge	RadPrivate = 1
+	
+	RadPrivateEnd 			RadPrivate = 2
+)
+type RadPrivate uint32
+
 type IAuth interface {
 	IAcct
 
@@ -28,10 +38,8 @@ type IAcct interface {
 	AcctOutputGigawords() uint32
 	AcctTerminateCause() uint32
 
-	// cache Class on user when auth
-	// get Class from user when acct
-	GetClass() []byte
-	SetClass(class []byte)
+	GetPrivate(t RadPrivate) interface{}
+	SetPrivete(t RadPrivate, e interface{})
 }
 
 type IParam interface {
@@ -43,6 +51,7 @@ type IParam interface {
 	//	NasPortId() uint32
 	ServiceType() uint32
 	Server() string
+	AuthType() uint32 // 0:pap, 1:chap
 	AuthPort() string
 	AcctPort() string
 	Timeout() uint32 // ms
@@ -84,6 +93,19 @@ func newClient(mac Mac) *client {
 	return c
 }
 
+func userInit(r IAuth) {
+	if authChap==r.AuthType() {
+		r.SetPrivete(RadPrivateChapChallenge, 
+			newChapChallenge(r.UserMac(), r.DevMac()))
+	}
+}
+
+func userFini(r IAuth) {
+	for i:=RadPrivateBegin; i<RadPrivateEnd; i++ {
+		r.SetPrivete(i, nil)
+	}
+}
+
 func (me *client) init() {
 	(&me.request).Init()
 	(&me.response).Init()
@@ -120,14 +142,33 @@ func (me *client) initAuth(r IAuth) error {
 		return me.debugError(err)
 	}
 
+	switch r.AuthType() {
+		case authPap:
+			password := enPapPassword(q.Auth[:], r.Secret(), r.UserPassword())
+			if err := q.SetAttrString(UserPassword, password); nil!=err {
+				return err
+			}
+		case authChap:
+			challenge, _ := r.GetPrivate(RadPrivateChapChallenge).([]byte)
+			if nil==challenge {
+				return ErrBadIntf
+			}
+			password := enChapPassword(r.UserPassword(), challenge)
+			
+			if err := q.SetAttrString(ChapChallenge, challenge); nil!=err {
+				return err
+			}
+			if err := q.SetAttrString(ChapPassword, password); nil!=err {
+				return err
+			}
+		default:
+			return ErrBadType
+	}
+	
 	if err := q.SetAttrStringList([]AttrString{
 		{
 			Type:  UserName,
 			Value: r.UserName(),
-		},
-		{
-			Type:  UserPassword,
-			Value: AttrUserPassword(r.UserPassword()).Encrypt(q.Auth[:], r.Secret()),
 		},
 		{
 			Type:  CalledStationId,
@@ -179,6 +220,8 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 	q.Code = AccountingRequest
 	q.Id = PktId()
 
+	class, _ := r.GetPrivate(RadPrivateClass).([]byte)
+	
 	if err := q.SetAttrStringList([]AttrString{
 		{
 			Type:  UserName,
@@ -202,7 +245,7 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 		},
 		{
 			Type:  Class,
-			Value: r.GetClass(),
+			Value: class,
 		},
 	}); nil != err {
 		return me.debugError(err)
@@ -342,7 +385,7 @@ func (me *client) auth(r IAuth) (*Policy, error, AuthError) {
 	}
 	
 	if authClass := p.Attrs[Class].GetString(); nil!=authClass {
-		r.SetClass(authClass)
+		r.SetPrivete(RadPrivateClass, authClass)
 	}
 
 	return p.Policy(), nil, nil
@@ -402,6 +445,7 @@ func (me *client) acct(r IAcct, action EAastValue) (error, AcctError) {
 
 func ClientAuth(r IAuth) (*Policy, error, AuthError) {
 	c := newClient(r.UserMac())
+	userInit(r)
 	defer func() { c = nil }()
 
 	return c.auth(r)

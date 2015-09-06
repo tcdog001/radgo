@@ -110,7 +110,7 @@ func (me EAttrType) IsGoodNumber(Value uint32) bool {
 }
 
 const (
-	AttrTypeBegin EAttrType = 1
+	AttrTypeBegin 		EAttrType = 1
 
 	UserName            EAttrType = 1
 	UserPassword        EAttrType = 2
@@ -139,8 +139,10 @@ const (
 	ChapChallenge       EAttrType = 60
 	NasPortType         EAttrType = 61
 	NasPortId           EAttrType = 87
-
-	AttrTypeEnd EAttrType = 88
+	
+	ErrorCause			EAttrType = 101
+	
+	AttrTypeEnd 		EAttrType = 102
 )
 
 type attrType struct {
@@ -162,10 +164,8 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
 			AccessAccept:       AttrTableZeroOne,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	UserPassword: &attrType{
@@ -175,11 +175,6 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		max:  128,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
-			AccountingRequest:  AttrTableZero,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	ChapPassword: &attrType{
@@ -189,11 +184,6 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		max:  17,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
-			AccountingRequest:  AttrTableZero,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	NasIpAddress: &attrType{
@@ -201,11 +191,8 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtAddress,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	NasPort: &attrType{
@@ -213,11 +200,8 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	ServiceType: &attrType{
@@ -226,10 +210,9 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
 			AccessAccept:       AttrTableZeroOne,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
+			DisconnectNak:		AttrTableZeroOne,
 		},
 	},
 	FramedIpAddress: &attrType{
@@ -238,58 +221,45 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
 			AccessAccept:       AttrTableZeroOne,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	ReplyMessage: &attrType{
 		name: "Reply-Message",
 		avt:  AvtText,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
 			AccessAccept:       AttrTableZeroMore,
 			AccessReject:       AttrTableZeroMore,
 			AccessChallenge:    AttrTableZeroMore,
-			AccountingRequest:  AttrTableZero,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroMore,
 		},
 	},
 	Class: &attrType{
 		name: "Class",
 		avt:  AvtString,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
 			AccessAccept:       AttrTableZeroMore,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroMore,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroMore,
 		},
 	},
 	SessionTimeout: &attrType{
 		name: "Session-Timeout",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
 			AccessAccept:       AttrTableZeroOne,
-			AccessReject:       AttrTableZero,
 			AccessChallenge:    AttrTableZeroOne,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	IdleTimeout: &attrType{
 		name: "Idle-Timeout",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
 			AccessAccept:       AttrTableZeroOne,
-			AccessReject:       AttrTableZero,
 			AccessChallenge:    AttrTableZeroOne,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	CalledStationId: &attrType{
@@ -297,11 +267,8 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtString,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	CallingStationId: &attrType{
@@ -309,11 +276,8 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtString,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	NasIdentifier: &attrType{
@@ -321,24 +285,18 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtString,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
-
 	EventTimestamp: &attrType{
 		name: "Event-Timestamp",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
+			DisconnectAck:		AttrTableZeroOne,
+			DisconnectNak:		AttrTableZeroOne,
 		},
 	},
 	ChapChallenge: &attrType{
@@ -347,11 +305,6 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		min:  5,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
-			AccountingRequest:  AttrTableZero,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	NasPortType: &attrType{
@@ -359,11 +312,8 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	NasPortId: &attrType{
@@ -371,11 +321,7 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		avt:  AvtText,
 		table: [PktCodeEnd]EAttrTableValue{
 			AccessRequest:      AttrTableZeroOne,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
-			AccountingRequest:  AttrTableZero,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 
@@ -383,108 +329,74 @@ var attrTypeBind = [AttrTypeEnd]*attrType{
 		name: "Acct-Status-Type",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	AcctDelayTime: &attrType{
 		name: "Acct-Delay-Time",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	AcctInputOctets: &attrType{
 		name: "Acct-Input-Octets",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	AcctOutputOctets: &attrType{
 		name: "Acct-Output-Octets",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	AcctSessionId: &attrType{
 		name: "Acct-Session-Id",
 		avt:  AvtText,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
 		},
 	},
 	AcctSessionTime: &attrType{
 		name: "Acct-Session-Time",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	AcctTerminateCause: &attrType{
 		name: "Acct-Terminate-Cause",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+			DisconnectRequest:	AttrTableZeroOne,
+			DisconnectAck:		AttrTableZeroOne,
 		},
 	},
 	AcctInputGigawords: &attrType{
 		name: "Acct-Input-Gigawords",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
 		},
 	},
 	AcctOutputGigawords: &attrType{
 		name: "Acct-Output-Gigawords",
 		avt:  AvtInteger,
 		table: [PktCodeEnd]EAttrTableValue{
-			AccessRequest:      AttrTableZero,
-			AccessAccept:       AttrTableZero,
-			AccessReject:       AttrTableZero,
-			AccessChallenge:    AttrTableZero,
 			AccountingRequest:  AttrTableZeroOne,
-			AccountingResponse: AttrTableZero,
+		},
+	},
+	ErrorCause: &attrType{
+		name: "Error-Cause",
+		avt:  AvtInteger,
+		table: [PktCodeEnd]EAttrTableValue{
+			DisconnectAck:		AttrTableZeroMore,
+			DisconnectNak:		AttrTableZeroMore,
 		},
 	},
 }

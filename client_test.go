@@ -2,33 +2,34 @@ package radgo
 
 import (
 	. "asdf"
-//	"fmt"
 	"testing"
 )
 
 type Param struct {
-	Secret        []byte
-	NasIdentifier []byte
-	NasIpAddress  uint32
-	NasPort       uint32
-	NasPortType   uint32
-	ServiceType   uint32
-	Server        string
-	AuthPort      string
-	AcctPort      string
-	Timeout       uint32 // ms
+	Secret        	[]byte
+	NasIdentifier 	[]byte
+	NasIpAddress  	uint32
+	NasPort       	uint32
+	NasPortType   	uint32
+	ServiceType   	uint32
+	Server        	string
+	AuthType 	  	uint32 // 0:pap, 1:chap
+	AuthPort      	string
+	AcctPort      	string
+	Timeout       	uint32 // ms
 }
 
 var param = &Param{
-	Secret:        []byte("testing123"),
-	NasIdentifier: []byte("ums.autelan.com"),
-	NasPort:       0,
-	NasPortType:   uint32(AnptIeee80211),
-	ServiceType:   uint32(AstLogin),
-	Server:        "116.228.184.202",
-	AuthPort:      "1812",
-	AcctPort:      "1813",
-	Timeout:       3000,
+	Secret:        	[]byte("testing123"),
+	NasIdentifier: 	[]byte("ums.autelan.com"),
+	NasPort:       	0,
+	NasPortType:   	uint32(AnptIeee80211),
+	ServiceType:   	uint32(AstLogin),
+	Server:        	"116.228.184.202",
+	AuthType:		1,
+	AuthPort:      	"1812",
+	AcctPort:      	"1813",
+	Timeout:       	3000,
 }
 
 type User struct {
@@ -46,7 +47,7 @@ type User struct {
 	outputg   uint32
 	reason    uint32
 
-	class []byte
+	private 	[RadPrivateEnd]interface{}
 }
 
 var user = &User{
@@ -122,12 +123,12 @@ func (me *User) AcctTerminateCause() uint32 {
 	return me.reason
 }
 
-func (me *User) GetClass() []byte {
-	return me.class
+func (me *User) GetPrivate(t RadPrivate) interface{} {
+	return me.private[t]
 }
 
-func (me *User) SetClass(class []byte) {
-	me.class = class
+func (me *User) SetPrivete(t RadPrivate, e interface{}) {
+	me.private[t] = e
 }
 
 func (me *User) Secret() []byte {
@@ -156,6 +157,10 @@ func (me *User) ServiceType() uint32 {
 
 func (me *User) Server() string {
 	return param.Server
+}
+
+func (me *User) AuthType() uint32 {
+	return param.AuthType
 }
 
 func (me *User) AuthPort() string {

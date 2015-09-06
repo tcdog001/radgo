@@ -74,16 +74,46 @@ func (me EPktCode) NetworkDir() ENetworkDir {
 }
 
 const (
-	PktCodeBegin EPktCode = 1
+	PktCodeBegin 		EPktCode = 1
 
-	AccessRequest      EPktCode = 1
-	AccessAccept       EPktCode = 2
-	AccessReject       EPktCode = 3
-	AccountingRequest  EPktCode = 4
-	AccountingResponse EPktCode = 5
-	AccessChallenge    EPktCode = 11
+	AccessRequest      	EPktCode = 1
+	AccessAccept       	EPktCode = 2
+	AccessReject       	EPktCode = 3
+	AccountingRequest  	EPktCode = 4
+	AccountingResponse 	EPktCode = 5
+//	AccountingStatus	EPktCode = 6
+//	PasswordRequest		EPktCode = 7
+//	PasswordAck			EPktCode = 8
+//	PasswordReject		EPktCode = 9
+//	AccountingMessage	EPktCode = 10
+	AccessChallenge    	EPktCode = 11
 
-	PktCodeEnd EPktCode = 12
+//	ResourceFreeRequest 	EPktCode = 21
+//	ResourceFreeResponse	EPktCode = 22
+//	ResourceQueryRequest	EPktCode = 23
+//	ResourceQueryResponse	EPktCode = 24
+//	AlternateResourceReclaimRequest EPktCode = 25
+//	NasRebootRequest		EPktCode = 26
+//	NasRebootResponse		EPktCode = 27
+	
+//	NextPasscode		EPktCode = 29
+//	NewPin				EPktCode = 30
+//	TerminateSession 	EPktCode = 31
+//	PasswordExpired 	EPktCode = 32
+//	EventRequest 		EPktCode = 33
+//	EventResponse 		EPktCode = 34
+
+	DisconnectRequest 	EPktCode = 40
+	DisconnectAck 		EPktCode = 41
+	DisconnectNak 		EPktCode = 42
+//	ChangeFiltersRequest 	EPktCode = 43
+//	ChangeFiltersAck 		EPktCode = 44
+//	ChangeFiltersNak 		EPktCode = 45
+
+//	IpAddressAllocate 	EPktCode = 50
+//	IpAddressRelease 	EPktCode = 51
+
+	PktCodeEnd 			EPktCode = 52
 )
 
 var pktCodeBind = [PktCodeEnd]string{
@@ -93,6 +123,9 @@ var pktCodeBind = [PktCodeEnd]string{
 	AccessChallenge:    "Access-Challenge",
 	AccountingRequest:  "Accounting-Request",
 	AccountingResponse: "Accounting-Response",
+	DisconnectRequest: 	"Disconnect-Request",
+	DisconnectAck: 		"Disconnect-Ack",
+	DisconnectNak: 		"Disconnect-Nak",
 }
 
 var pktCodeMap = map[string]EPktCode{}
@@ -104,6 +137,9 @@ var codeDirBind = [PktCodeEnd]ENetworkDir{
 	AccessChallenge:    ToClient,
 	AccountingRequest:  ToServer,
 	AccountingResponse: ToClient,
+	DisconnectRequest:	ToClient,
+	DisconnectAck:		ToServer,
+	DisconnectNak:		ToServer,
 }
 
 func initPktCode() {
