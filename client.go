@@ -37,9 +37,12 @@ type IAcct interface {
 	AcctInputGigawords() uint32
 	AcctOutputGigawords() uint32
 	AcctTerminateCause() uint32
-
-	GetPrivate(t RadPrivate) interface{}
-	SetPrivete(t RadPrivate, e interface{})
+	
+	GetClass() []byte
+	SetClass(c []byte)
+	
+	GetChapChallenge() []byte
+	SetChapChallenge(c []byte)
 }
 
 type IParam interface {
@@ -72,18 +75,18 @@ type Policy struct {
 }
 
 type client struct {
-	request   Packet
-	response  Packet
-	bin       [PktLengthMax]byte
-	rlen      int
-	sessionId [AcctSessionIdLength]byte
+	request   	Packet
+	response  	Packet
+	bin       	[PktLengthMax]byte
+	rlen      	int
+	sessionId 	[AcctSessionIdLength]byte
 
 	//cache
-	mac []byte
+	mac 		[]byte
 
 	// socket
-	remote *net.UDPAddr
-	conn   *net.UDPConn
+	remote 		*net.UDPAddr
+	conn   		*net.UDPConn
 }
 
 func newClient(mac Mac) *client {
@@ -96,14 +99,7 @@ func newClient(mac Mac) *client {
 
 func userInit(r IAuth) {
 	if authChap==r.AuthType() {
-		r.SetPrivete(RadPrivateChapChallenge, 
-			newChapChallenge(r.UserMac(), r.DevMac()))
-	}
-}
-
-func userFini(r IAuth) {
-	for i:=RadPrivateBegin; i<RadPrivateEnd; i++ {
-		r.SetPrivete(i, nil)
+		r.SetChapChallenge(newChapChallenge(r.UserMac(), r.DevMac()))
 	}
 }
 
@@ -150,10 +146,7 @@ func (me *client) initAuth(r IAuth) error {
 				return err
 			}
 		case authChap:
-			challenge, _ := r.GetPrivate(RadPrivateChapChallenge).([]byte)
-			if nil==challenge {
-				return ErrBadIntf
-			}
+			challenge := r.GetChapChallenge()
 			password := enChapPassword(r.UserPassword(), challenge)
 			
 			if err := q.SetAttrString(ChapChallenge, challenge); nil!=err {
@@ -220,8 +213,6 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 
 	q.Code = AccountingRequest
 	q.Id = PktId()
-
-	class, _ := r.GetPrivate(RadPrivateClass).([]byte)
 	
 	if err := q.SetAttrStringList([]AttrString{
 		{
@@ -246,7 +237,7 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 		},
 		{
 			Type:  Class,
-			Value: class,
+			Value: r.GetClass(),
 		},
 	}); nil != err {
 		return me.debugError(err)
@@ -386,7 +377,7 @@ func (me *client) auth(r IAuth) (*Policy, error, AuthError) {
 	}
 	
 	if authClass := p.Attrs[Class].GetString(); nil!=authClass {
-		r.SetPrivete(RadPrivateClass, authClass)
+		r.SetClass(authClass)
 	}
 
 	return p.Policy(), nil, nil

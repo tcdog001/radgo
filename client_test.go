@@ -35,21 +35,22 @@ var param = &Param{
 }
 
 type User struct {
-	ssid []byte
-	dev  [6]byte
+	ssid 		[]byte
+	dev  		[6]byte
 
-	passwd    []byte
-	sessionid string
-	name      []byte
-	mac       [6]byte // binary mac
-	ip        uint32
-	input     uint32
-	output    uint32
-	inputg    uint32
-	outputg   uint32
-	reason    uint32
+	passwd    	[]byte
+	sessionid 	[]byte
+	name      	[]byte
+	mac       	[6]byte // binary mac
+	ip        	uint32
+	input     	uint32
+	output    	uint32
+	inputg    	uint32
+	outputg   	uint32
+	reason    	uint32
 
-	private 	[RadPrivateEnd]interface{}
+	class 		[]byte
+	challenge 	[]byte
 }
 
 var user = &User{
@@ -90,7 +91,7 @@ func (me *User) UserPassword() []byte {
 }
 
 func (me *User) SessionId() []byte {
-	return []byte(me.sessionid)
+	return me.sessionid
 }
 
 func (me *User) UserName() []byte {
@@ -125,12 +126,20 @@ func (me *User) AcctTerminateCause() uint32 {
 	return me.reason
 }
 
-func (me *User) GetPrivate(t RadPrivate) interface{} {
-	return me.private[t]
+func (me *User) GetClass() []byte {
+	return me.class
 }
 
-func (me *User) SetPrivete(t RadPrivate, e interface{}) {
-	me.private[t] = e
+func (me *User) SetClass(c []byte) {
+	me.class = c
+}
+
+func (me *User) GetChapChallenge() []byte {
+	return me.challenge
+}
+
+func (me *User) SetChapChallenge(c []byte) {
+	me.challenge = c
 }
 
 func (me *User) Secret() []byte {
