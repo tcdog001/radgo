@@ -107,6 +107,13 @@ func initAtc() {
 }
 
 // device deauth resaon
+// 0: none
+// 1: auto
+// 2: onlinetime
+// 3: flowlimit
+// 4: admin
+// 5: aging
+// 6: initiative
 type DeauthReason uint32
 
 func (me DeauthReason) Tag() string {
@@ -162,15 +169,16 @@ func (me DeauthReason) TerminateCause() uint32 {
 const (
 	DeauthReasonBegin DeauthReason = 0
 
-	DeauthReasonNone       DeauthReason = 0
-	DeauthReasonAuto       DeauthReason = 1
-	DeauthReasonOnlineTime DeauthReason = 2
-	DeauthReasonFlowLimit  DeauthReason = 3
-	DeauthReasonAdmin      DeauthReason = 4
-	DeauthReasonAging      DeauthReason = 5
-	DeauthReasonInitiative DeauthReason = 6
-
-	DeauthReasonEnd DeauthReason = 7
+	DeauthReasonNone       	DeauthReason = 0
+	DeauthReasonAuto       	DeauthReason = 1
+	DeauthReasonOnlineTime 	DeauthReason = 2
+	DeauthReasonFlowLimit  	DeauthReason = 3
+	DeauthReasonAdmin      	DeauthReason = 4
+	DeauthReasonAging      	DeauthReason = 5
+	DeauthReasonInitiative 	DeauthReason = 6
+	DeauthReasonNasError	DeauthReason = 7
+	
+	DeauthReasonEnd DeauthReason = 8
 )
 
 var drBind = [DeauthReasonEnd]string{
@@ -181,6 +189,7 @@ var drBind = [DeauthReasonEnd]string{
 	DeauthReasonAdmin:      "Admin",
 	DeauthReasonAging:      "IdleTimeOut",
 	DeauthReasonInitiative: "Initiative",
+	DeauthReasonNasError:	"NasError",
 }
 
 var ressonToCause = [DeauthReasonEnd]EAtcValue{
@@ -191,6 +200,7 @@ var ressonToCause = [DeauthReasonEnd]EAtcValue{
 	DeauthReasonAdmin:      AtcAdminReset,
 	DeauthReasonAging:      AtcIdleTimeout,
 	DeauthReasonInitiative: AtcUserRequest,
+	DeauthReasonNasError:	AtcNasError,
 }
 
 var drMap = map[string]DeauthReason{}
