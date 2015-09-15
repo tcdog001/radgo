@@ -10,7 +10,7 @@ const (
 	authChap	= 1
 	
 	papBlockSize 		= 16
-	chapChallengeSize 	= 16
+	ChapChallengeSize 	= 16
 )
 
 type papPassword []byte
@@ -72,7 +72,7 @@ func xor(r []byte, a []byte, b []byte) {
 
 // Chap-Challenge = user-mac + dev-mac + random + random + random + id
 func newChapChallenge(user, dev Mac) []byte {
-	c := [chapChallengeSize]byte{}
+	c := [ChapChallengeSize]byte{}
 	
 	copy(c[0:], user)
 	copy(c[6:], dev)

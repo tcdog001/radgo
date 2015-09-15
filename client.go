@@ -79,7 +79,6 @@ type client struct {
 	response  	Packet
 	bin       	[PktLengthMax]byte
 	rlen      	int
-	sessionId 	[AcctSessionIdLength]byte
 
 	//cache
 	mac 		[]byte
