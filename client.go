@@ -2,19 +2,20 @@ package radgo
 
 import (
 	. "asdf"
+	"errors"
 	"net"
 	"time"
-	"errors"
 )
 
 const (
-	RadPrivateBegin 		RadPrivate = 0
-	
-	RadPrivateClass 		RadPrivate = 0
-	RadPrivateChapChallenge	RadPrivate = 1
-	
-	RadPrivateEnd 			RadPrivate = 2
+	RadPrivateBegin RadPrivate = 0
+
+	RadPrivateClass         RadPrivate = 0
+	RadPrivateChapChallenge RadPrivate = 1
+
+	RadPrivateEnd RadPrivate = 2
 )
+
 type RadPrivate uint32
 
 type IAuth interface {
@@ -37,10 +38,10 @@ type IAcct interface {
 	AcctInputGigawords() uint32
 	AcctOutputGigawords() uint32
 	AcctTerminateCause() uint32
-	
+
 	GetClass() []byte
 	SetClass(c []byte)
-	
+
 	GetChapChallenge() []byte
 	SetChapChallenge(c []byte)
 }
@@ -75,17 +76,17 @@ type Policy struct {
 }
 
 type client struct {
-	request   	Packet
-	response  	Packet
-	bin       	[PktLengthMax]byte
-	rlen      	int
+	request  Packet
+	response Packet
+	bin      [PktLengthMax]byte
+	rlen     int
 
 	//cache
-	mac 		[]byte
+	mac []byte
 
 	// socket
-	remote 		*net.UDPAddr
-	conn   		*net.UDPConn
+	remote *net.UDPAddr
+	conn   *net.UDPConn
 }
 
 func newClient(mac Mac) *client {
@@ -97,7 +98,7 @@ func newClient(mac Mac) *client {
 }
 
 func userInit(r IAuth) {
-	if authChap==r.AuthType() {
+	if authChap == r.AuthType() {
 		r.SetChapChallenge(newChapChallenge(r.UserMac(), r.DevMac()))
 	}
 }
@@ -109,7 +110,7 @@ func (me *client) init() {
 
 func (me *client) debugError(err error) error {
 	debugUserError(me.mac, err)
-
+	fmt.Println(me.mac, err)
 	return err
 }
 
@@ -139,25 +140,25 @@ func (me *client) initAuth(r IAuth) error {
 	}
 
 	switch r.AuthType() {
-		case authPap:
-			password := enPapPassword(q.Auth[:], r.Secret(), r.UserPassword())
-			if err := q.SetAttrString(UserPassword, password); nil!=err {
-				return err
-			}
-		case authChap:
-			challenge := r.GetChapChallenge()
-			password := enChapPassword(r.UserPassword(), challenge)
-			
-			if err := q.SetAttrString(ChapChallenge, challenge); nil!=err {
-				return err
-			}
-			if err := q.SetAttrString(ChapPassword, password); nil!=err {
-				return err
-			}
-		default:
-			return ErrBadType
+	case authPap:
+		password := enPapPassword(q.Auth[:], r.Secret(), r.UserPassword())
+		if err := q.SetAttrString(UserPassword, password); nil != err {
+			return err
+		}
+	case authChap:
+		challenge := r.GetChapChallenge()
+		password := enChapPassword(r.UserPassword(), challenge)
+
+		if err := q.SetAttrString(ChapChallenge, challenge); nil != err {
+			return err
+		}
+		if err := q.SetAttrString(ChapPassword, password); nil != err {
+			return err
+		}
+	default:
+		return ErrBadType
 	}
-	
+
 	if err := q.SetAttrStringList([]AttrString{
 		{
 			Type:  UserName,
@@ -212,7 +213,7 @@ func (me *client) initAcct(r IAcct, action EAastValue) error {
 
 	q.Code = AccountingRequest
 	q.Id = PktId()
-	
+
 	if err := q.SetAttrStringList([]AttrString{
 		{
 			Type:  UserName,
@@ -365,7 +366,7 @@ func (me *client) auth(r IAuth) (*Policy, error, AuthError) {
 	if AccessAccept != p.Code {
 		return nil, me.debugError(Error), nil
 	}
-	
+
 	if authError := p.Attrs[ReplyMessage].GetString(); nil != authError {
 		err := errors.New(string(authError))
 		if IsGoodReplyMessage(authError) {
@@ -374,8 +375,8 @@ func (me *client) auth(r IAuth) (*Policy, error, AuthError) {
 			return nil, ErrUnknowReplyMessage, err
 		}
 	}
-	
-	if authClass := p.Attrs[Class].GetString(); nil!=authClass {
+
+	if authClass := p.Attrs[Class].GetString(); nil != authClass {
 		r.SetClass(authClass)
 	}
 
@@ -421,7 +422,7 @@ func (me *client) acct(r IAcct, action EAastValue) (error, AcctError) {
 	if AccountingResponse != p.Code {
 		return me.debugError(Error), nil
 	}
-	
+
 	if acctError := p.Attrs[ReplyMessage].GetString(); nil != acctError {
 		err := errors.New(string(acctError))
 		if IsGoodReplyMessage(acctError) {
@@ -467,8 +468,8 @@ func ClientAcctStop(r IAcct) (error, AcctError) {
 type DmDeft struct{}
 
 func (me *DmDeft) DM(mac Mac) error {
-	Log.Info("DM %s" + Crlf, mac.ToString())
-	
+	Log.Info("DM %s"+Crlf, mac.ToString())
+
 	return nil
 }
 
@@ -484,5 +485,5 @@ func SetDM(dm IDm) {
 
 // go it
 func radRun() {
-	
+
 }
