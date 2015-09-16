@@ -183,8 +183,10 @@ type AttrString struct {
 
 func (me *Packet) SetAttrStringList(list []AttrString) error {
 	for _, v := range list {
-		if err := me.SetAttrString(v.Type, v.Value); nil != err {
-			return err
+		if nil!=v.Value && len(v.Value) > 0 {
+			if err := me.SetAttrString(v.Type, v.Value); nil != err {
+				return err
+			}
 		}
 	}
 

@@ -78,4 +78,5 @@ func debugUser(mac Mac, format string, v ...interface{}) {
 
 func debugUserError(mac Mac, v ...interface{}) {
 	debugUser(mac, Empty, v)
+	Log.Debug(Empty, v)
 }
