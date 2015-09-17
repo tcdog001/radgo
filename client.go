@@ -431,7 +431,6 @@ func (me *client) acct(r IAcct, action EAastValue) (error, AcctError) {
 			return ErrUnknowReplyMessage, err
 		}
 	}
-
 	return nil, nil
 }
 
