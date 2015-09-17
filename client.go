@@ -110,7 +110,7 @@ func (me *client) init() {
 
 func (me *client) debugError(err error) error {
 	debugUserError(me.mac, err)
-	fmt.Println(me.mac, err)
+
 	return err
 }
 

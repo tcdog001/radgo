@@ -166,6 +166,14 @@ func (me DeauthReason) TerminateCause() uint32 {
 	return uint32(ressonToCause[me])
 }
 
+func GetDeauthReason(Name string) DeauthReason {
+	reason := DeauthReasonNone
+	
+	(&reason).FromString(Name)
+	
+	return reason
+}
+
 const (
 	DeauthReasonBegin DeauthReason = 0
 
@@ -182,14 +190,14 @@ const (
 )
 
 var drBind = [DeauthReasonEnd]string{
-	DeauthReasonNone:       "None",
-	DeauthReasonAuto:       "Auto",
-	DeauthReasonOnlineTime: "OnlineTimeOut",
-	DeauthReasonFlowLimit:  "FlowLimit",
-	DeauthReasonAdmin:      "Admin",
-	DeauthReasonAging:      "IdleTimeOut",
-	DeauthReasonInitiative: "Initiative",
-	DeauthReasonNasError:	"NasError",
+	DeauthReasonNone:       "none",
+	DeauthReasonAuto:       "auto",
+	DeauthReasonOnlineTime: "onlinetimeout",
+	DeauthReasonFlowLimit:  "flowlimit",
+	DeauthReasonAdmin:      "admin",
+	DeauthReasonAging:      "idletimeout",
+	DeauthReasonInitiative: "initiative",
+	DeauthReasonNasError:	"naserror",
 }
 
 var ressonToCause = [DeauthReasonEnd]EAtcValue{
